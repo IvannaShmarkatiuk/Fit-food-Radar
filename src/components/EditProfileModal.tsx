@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { XIcon, UploadIcon } from 'lucide-react';
 
 const PRESET_AVATARS = [
@@ -8,23 +8,26 @@ const PRESET_AVATARS = [
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver'
 ];
 
-export interface UserData {
-  name: string;
-  avatarUrl: string | null;
-}
-
-interface LoginModalProps {
+interface EditProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (data: UserData) => void;
+  onSave: (data: { name: string; avatarUrl: string | null }) => void;
+  currentName: string;
+  currentAvatar: string | null;
 }
 
-export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+export function EditProfileModal({ isOpen, onClose, onSave, currentName, currentAvatar }: EditProfileModalProps) {
+  const [name, setName] = useState(currentName);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(currentAvatar);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Оновлюємо дані у формі, коли вікно відкривається
+  useEffect(() => {
+    if (isOpen) {
+      setName(currentName);
+      setAvatarUrl(currentAvatar);
+    }
+  }, [isOpen, currentName, currentAvatar]);
 
   if (!isOpen) return null;
 
@@ -41,12 +44,8 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim() && email.trim() && password.trim()) {
-      onLogin({ name, avatarUrl });
-      setName('');
-      setEmail('');
-      setPassword('');
-      setAvatarUrl(null);
+    if (name.trim()) {
+      onSave({ name, avatarUrl });
     }
   };
 
@@ -58,12 +57,12 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
         </button>
 
         <div className="p-8">
-          <h2 className="text-2xl font-bold text-[#EDE8D0] mb-2">Реєстрація / Вхід</h2>
-          <p className="text-[#8A8278] mb-6">Створіть свій профіль, щоб залишати відгуки.</p>
+          <h2 className="text-2xl font-bold text-[#EDE8D0] mb-2">Редагувати профіль</h2>
+          <p className="text-[#8A8278] mb-6">Оновіть своє ім'я або змініть аватарку.</p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-[#B8B0A0] mb-3">Оберіть аватарку</label>
+              <label className="block text-sm font-medium text-[#B8B0A0] mb-3">Оберіть нову аватарку</label>
               <div className="flex items-center gap-3">
                 {PRESET_AVATARS.map((url) => (
                   <button
@@ -92,22 +91,12 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#B8B0A0] mb-2">Як вас звати?</label>
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ваше ім'я" className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] focus:border-transparent transition-all" required />
+              <label className="block text-sm font-medium text-[#B8B0A0] mb-2">Ваше ім'я</label>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] focus:border-transparent transition-all" required />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-[#B8B0A0] mb-2">Електронна пошта</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@gmail.com" className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] focus:border-transparent transition-all" required />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#B8B0A0] mb-2">Пароль</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] focus:border-transparent transition-all" required />
-            </div>
-            
-            <button type="submit" className="w-full py-3 mt-4 bg-[#2E7D32] hover:bg-[#236026] text-[#EDE8D0] font-bold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#2E7D32] focus:ring-offset-2 focus:ring-offset-[#1A1A1A]">
-              Увійти в систему
+            <button type="submit" className="w-full py-3 mt-4 bg-[#C45A2A] hover:bg-[#A0451C] text-[#EDE8D0] font-bold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#C45A2A] focus:ring-offset-2 focus:ring-offset-[#1A1A1A]">
+              Зберегти зміни
             </button>
           </form>
         </div>
