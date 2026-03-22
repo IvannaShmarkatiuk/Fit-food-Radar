@@ -1,11 +1,13 @@
-import React, { useState, useRef } from 'react';
-import { XIcon, UploadIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { XIcon } from 'lucide-react';
 
 const PRESET_AVATARS = [
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Mimi',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver'
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Jasper',
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna'
 ];
 
 export interface UserData {
@@ -23,21 +25,9 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(PRESET_AVATARS[0]);
 
   if (!isOpen) return null;
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +36,6 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
       setName('');
       setEmail('');
       setPassword('');
-      setAvatarUrl(null);
     }
   };
 
@@ -64,49 +53,36 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-[#B8B0A0] mb-3">Оберіть аватарку</label>
-              <div className="flex items-center gap-3">
+              <div className="grid grid-cols-6 gap-3">
                 {PRESET_AVATARS.map((url) => (
                   <button
                     key={url}
                     type="button"
                     onClick={() => setAvatarUrl(url)}
-                    className={`w-12 h-12 rounded-full overflow-hidden border-2 transition-all ${avatarUrl === url ? 'border-[#C45A2A] scale-110' : 'border-transparent hover:border-[#4A4A4A]'}`}
+                    className={`w-10 h-10 rounded-full overflow-hidden border-2 transition-all ${avatarUrl === url ? 'border-[#C45A2A] scale-110' : 'border-transparent hover:border-[#4A4A4A]'}`}
                   >
                     <img src={url} alt="preset" className="w-full h-full bg-[#EDE8D0]" />
                   </button>
                 ))}
-                <div className="w-px h-8 bg-[#333333] mx-2" />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all overflow-hidden ${avatarUrl && !PRESET_AVATARS.includes(avatarUrl) ? 'border-[#C45A2A]' : 'border-dashed border-[#4A4A4A] hover:border-[#C45A2A] text-[#8A8278]'}`}
-                >
-                  {avatarUrl && !PRESET_AVATARS.includes(avatarUrl) ? (
-                    <img src={avatarUrl} alt="uploaded" className="w-full h-full object-cover" />
-                  ) : (
-                    <UploadIcon className="w-5 h-5" />
-                  )}
-                </button>
-                <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#B8B0A0] mb-2">Як вас звати?</label>
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ваше ім'я" className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] focus:border-transparent transition-all" required />
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ваше ім'я" className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] transition-all" required />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#B8B0A0] mb-2">Електронна пошта</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@gmail.com" className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] focus:border-transparent transition-all" required />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@gmail.com" className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] transition-all" required />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#B8B0A0] mb-2">Пароль</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] focus:border-transparent transition-all" required />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] transition-all" required />
             </div>
             
-            <button type="submit" className="w-full py-3 mt-4 bg-[#2E7D32] hover:bg-[#236026] text-[#EDE8D0] font-bold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#2E7D32] focus:ring-offset-2 focus:ring-offset-[#1A1A1A]">
+            <button type="submit" className="w-full py-3 mt-4 bg-[#2E7D32] hover:bg-[#236026] text-[#EDE8D0] font-bold rounded-lg transition-colors">
               Увійти в систему
             </button>
           </form>

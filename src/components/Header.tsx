@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SearchIcon, UserIcon, LogOutIcon, HeartIcon, StoreIcon, MessageSquareIcon, ChevronDownIcon } from 'lucide-react';
+import { SearchIcon, UserIcon, LogOutIcon, HeartIcon, ChevronDownIcon, SettingsIcon, SendIcon, LifeBuoyIcon } from 'lucide-react';
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -11,15 +11,15 @@ interface HeaderProps {
   onFavoritesClick: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onEditProfileClick: () => void;
 }
 
-export function Header({ onLoginClick, onLogoClick, isLoggedIn, userName, userAvatar, onLogout, onFavoritesClick, searchQuery, onSearchChange }: HeaderProps) {
+export function Header({ onLoginClick, onLogoClick, isLoggedIn, userName, userAvatar, onLogout, onFavoritesClick, searchQuery, onSearchChange, onEditProfileClick }: HeaderProps) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   return (
     <header className="w-full bg-[#1A1A1A] border-b border-[#333333] sticky top-0 z-40">
       <div className="max-w-[1440px] mx-auto px-8 h-20 flex items-center justify-between">
-        
         <button onClick={onLogoClick} className="flex items-center gap-3 hover:opacity-80 transition-opacity focus:outline-none">
           <img src="/Component_1.png" alt="Логотип" className="h-12 w-12 object-contain rounded-full bg-[#EDE8D0]" />
           <span className="text-[#EDE8D0] font-bold text-xl hidden md:block tracking-wide">Де поїсти ФІТ?</span>
@@ -30,13 +30,7 @@ export function Header({ onLoginClick, onLogoClick, isLoggedIn, userName, userAv
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <SearchIcon className="h-5 w-5 text-[#8A8278] group-focus-within:text-[#C45A2A] transition-colors" />
             </div>
-            <input 
-              type="text" 
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="block w-full pl-11 pr-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#8A8278] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] focus:border-transparent transition-all" 
-              placeholder="Пошук закладів або категорій..." 
-            />
+            <input type="text" value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} className="block w-full pl-11 pr-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#8A8278] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] focus:border-transparent transition-all" placeholder="Пошук закладів..." />
           </div>
         </div>
 
@@ -59,20 +53,39 @@ export function Header({ onLoginClick, onLogoClick, isLoggedIn, userName, userAv
             {isProfileMenuOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setIsProfileMenuOpen(false)} />
-                <div className="absolute right-0 top-full mt-2 w-64 bg-[#1A1A1A] border border-[#333333] rounded-xl shadow-2xl py-2 z-50 animate-in fade-in duration-200">
+                <div className="absolute right-0 top-full mt-2 w-72 bg-[#1A1A1A] border border-[#333333] rounded-xl shadow-2xl py-2 z-50 animate-in fade-in duration-200">
+                  <button onClick={() => { onEditProfileClick(); setIsProfileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-[#EDE8D0] hover:bg-[#252525] transition-colors">
+                    <SettingsIcon className="w-5 h-5 text-[#8A8278]" />
+                    <span className="font-medium">Редагувати профіль</span>
+                  </button>
+
                   <button onClick={() => { onFavoritesClick(); setIsProfileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-[#EDE8D0] hover:bg-[#252525] transition-colors">
                     <HeartIcon className="w-5 h-5 text-[#C45A2A]" />
                     <span className="font-medium">Улюблені заклади</span>
                   </button>
-                  <a href="https://t.me/ТВІЙ_НІКНЕЙМ" target="_blank" rel="noopener noreferrer" className="w-full flex items-center gap-3 px-4 py-2.5 text-[#EDE8D0] hover:bg-[#252525] transition-colors">
-                    <StoreIcon className="w-5 h-5 text-[#2E7D32]" />
-                    <span className="font-medium">Запропонувати заклад</span>
-                  </a>
-                  <a href="https://t.me/ТВІЙ_НІКНЕЙМ" target="_blank" rel="noopener noreferrer" className="w-full flex items-center gap-3 px-4 py-2.5 text-[#EDE8D0] hover:bg-[#252525] transition-colors">
-                    <MessageSquareIcon className="w-5 h-5 text-[#3B82F6]" />
-                    <span className="font-medium">Підтримка</span>
-                  </a>
+
                   <div className="h-px bg-[#333333] my-2" />
+
+                  <div className="px-4 py-3">
+                    <div className="flex items-start gap-3 mb-4">
+                      <SendIcon className="w-5 h-5 text-[#2E7D32] mt-0.5" />
+                      <div>
+                        <p className="text-[10px] text-[#8A8278] uppercase font-bold tracking-wider mb-0.5">Хочете додати заклад?</p>
+                        <p className="text-[#EDE8D0] text-sm">Пишіть: <span className="text-[#2E7D32] font-semibold">@geniykabesnika</span></p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <LifeBuoyIcon className="w-5 h-5 text-[#3B82F6] mt-0.5" />
+                      <div>
+                        <p className="text-[10px] text-[#8A8278] uppercase font-bold tracking-wider mb-0.5">Потрібна підтримка?</p>
+                        <p className="text-[#EDE8D0] text-sm">Зв'язок: <span className="text-[#3B82F6] font-semibold">@geniykabesnika</span></p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-[#333333] my-2" />
+                  
                   <button onClick={() => { onLogout(); setIsProfileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors group">
                     <LogOutIcon className="w-5 h-5" />
                     <span className="font-medium">Вийти з акаунта</span>

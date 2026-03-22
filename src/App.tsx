@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { CatalogPage } from './pages/CatalogPage';
 import { RestaurantDetailPage } from './pages/RestaurantDetailPage';
 import { LoginModal, UserData } from './components/LoginModal';
+import { EditProfileModal } from './components/EditProfileModal';
 import { mockRestaurants } from './data/restaurants';
 import { RestaurantCard } from './components/RestaurantCard';
 
@@ -10,6 +11,7 @@ export function App() {
   const [currentPage, setCurrentPage] = useState<'catalog' | 'detail' | 'favorites'>('catalog');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
@@ -42,6 +44,12 @@ export function App() {
     setUserAvatar(data.avatarUrl);
     setIsLoggedIn(true);
     setShowLoginModal(false);
+  };
+
+  const handleEditProfile = (data: { name: string; avatarUrl: string | null }) => {
+    setUserName(data.name);
+    setUserAvatar(data.avatarUrl);
+    setShowEditModal(false);
   };
 
   const handleLogout = () => {
@@ -82,6 +90,7 @@ export function App() {
         onFavoritesClick={() => setCurrentPage('favorites')}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        onEditProfileClick={() => setShowEditModal(true)}
       />
 
       {currentPage === 'catalog' && (
@@ -100,6 +109,14 @@ export function App() {
       {currentPage === 'favorites' && renderFavorites()}
 
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} onLogin={handleLogin} />
+      
+      <EditProfileModal 
+        isOpen={showEditModal} 
+        onClose={() => setShowEditModal(false)} 
+        onSave={handleEditProfile} 
+        currentName={userName} 
+        currentAvatar={userAvatar} 
+      />
     </div>
   );
 }
