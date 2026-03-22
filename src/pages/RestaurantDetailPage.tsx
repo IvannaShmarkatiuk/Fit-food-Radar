@@ -1,9 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { HeartIcon, MapPinIcon, ArrowLeftIcon, StarIcon } from 'lucide-react';
-import { ReviewSection, ExtendedReview } from '../components/ReviewSection';
+import { MapPinIcon, ArrowLeftIcon, StarIcon } from 'lucide-react';
+import { ReviewSection } from '../components/ReviewSection';
 import { mockRestaurants } from '../data/restaurants';
 import { mockReviews } from '../data/reviews';
+
+export interface ExtendedReview {
+  id: string;
+  visitorName: string;
+  date: string;
+  text: string;
+  avatarColor: string;
+  avatarUrl?: string | null;
+  rating: number;
+}
 
 interface RestaurantDetailPageProps {
   restaurantId: string;
@@ -15,19 +25,29 @@ interface RestaurantDetailPageProps {
 
 export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvatar, isLoggedIn }: RestaurantDetailPageProps) {
   const restaurant = mockRestaurants.find((r) => r.id === restaurantId) || mockRestaurants[0];
+  
+  // Стейт для списку відгуків
   const [reviews, setReviews] = useState<ExtendedReview[]>(mockReviews[restaurant.id] || []);
 
-  const handleAddReview = (text: string) => {
+  // Динамічний підрахунок рейтингу
+  const currentRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return (sum / reviews.length).toFixed(1);
+  }, [reviews]);
+
+  const handleAddReview = (text: string, rating: number) => {
     const newReview: ExtendedReview = {
       id: Date.now().toString(),
       visitorName: userName,
       date: 'Щойно',
       text: text,
       avatarColor: 'bg-[#2E7D32]',
-      avatarUrl: userAvatar
+      avatarUrl: userAvatar,
+      rating: rating
     };
-    const updatedReviews = [newReview, ...reviews];
-    setReviews(updatedReviews);
+    
+    setReviews([newReview, ...reviews]);
   };
 
   return (
@@ -39,7 +59,7 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
           <div className={`w-full h-full bg-gradient-to-br ${restaurant.imageColor}`} />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#121212] to-transparent opacity-80" />
-        <button onClick={onBack} className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-black/40 hover:bg-black/60 backdrop-blur-md text-[#EDE8D0] rounded-lg border border-white/10">
+        <button onClick={onBack} className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-black/40 hover:bg-black/60 backdrop-blur-md text-[#EDE8D0] rounded-lg border border-white/10 transition-colors">
           <ArrowLeftIcon className="w-4 h-4" /><span>Назад до закладів</span>
         </button>
       </div>
@@ -51,7 +71,8 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
               <h1 className="text-5xl font-bold text-[#EDE8D0] tracking-tight">{restaurant.name}</h1>
               <div className="flex items-center gap-1.5 bg-[#1A1A1A] px-3 py-1.5 rounded-lg border border-[#333333] shadow-lg">
                 <StarIcon className="w-5 h-5 text-[#C45A2A] fill-[#C45A2A]" />
-                <span className="text-[#EDE8D0] font-bold text-lg">{restaurant.rating}</span>
+                <span className="text-[#EDE8D0] font-bold text-lg">{currentRating}</span>
+                <span className="text-[#8A8278] text-sm font-normal ml-1">({reviews.length})</span>
               </div>
             </div>
             <div className="flex items-center gap-2 text-[#B8B0A0] text-lg">
