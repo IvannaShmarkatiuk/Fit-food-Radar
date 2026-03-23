@@ -21,7 +21,7 @@ export function Header({ onLoginClick, onLogoClick, isLoggedIn, userName, userAv
     <header className="w-full bg-[#1A1A1A] border-b border-[#333333] sticky top-0 z-40">
       <div className="max-w-[1440px] mx-auto px-8 h-20 flex items-center justify-between">
         <button onClick={onLogoClick} className="flex items-center gap-3 hover:opacity-80 transition-opacity focus:outline-none">
-          <img src="/Component_1.png" alt="Логотип" className="h-12 w-12 object-contain rounded-full bg-[#EDE8D0]" />
+          <img src="/favicon.png" alt="Логотип" className="h-12 w-12 object-contain rounded-full bg-[#EDE8D0]" />
           <span className="text-[#EDE8D0] font-bold text-xl hidden md:block tracking-wide">Де поїсти ФІТ?</span>
         </button>
 
