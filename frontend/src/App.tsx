@@ -146,7 +146,6 @@ export function App() {
           isLoggedIn={isLoggedIn} 
         />
       )}
-
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} onLogin={handleLogin} />
       <EditProfileModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} onSave={handleEditProfile} currentName={userName} currentAvatar={userAvatar} />
     </div>
