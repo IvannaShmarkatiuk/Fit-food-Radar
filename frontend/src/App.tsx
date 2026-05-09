@@ -27,7 +27,7 @@ export function App() {
     setIsLoading(true);
     setError(null); 
 
-    fetch(`${API_URL}/api/Restaurants`)
+    fetch(`${API_URL}/api/Restaurant`)
       .then(res => {
         if (!res.ok) throw new Error("Сервер Майї відпочиває");
         return res.json();
