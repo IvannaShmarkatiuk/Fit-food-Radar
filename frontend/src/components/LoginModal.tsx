@@ -49,23 +49,25 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
         <button onClick={onClose} className="absolute top-4 right-4 text-[#8A8278] hover:text-[#EDE8D0]">
           <XIcon size={20} />
         </button>
-        <h2 className="text-2xl font-bold text-[#EDE8D0] mb-2">Вхід</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-4 gap-2 mb-6">
+        <h2 className="text-2xl font-bold text-[#EDE8D0] mb-2 text-center uppercase tracking-tight">Вхід</h2>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+          <div className="flex justify-center gap-3 mb-6">
             {PRESET_AVATARS.map(url => (
-              <img key={url} src={url} alt="av" onClick={() => setAvatarUrl(url)} 
-                className={`w-12 h-12 rounded-full cursor-pointer border-2 transition-all ${avatarUrl === url ? 'border-[#C45A2A] scale-110' : 'border-transparent opacity-50'}`} />
+              <button key={url} type="button" onClick={() => setAvatarUrl(url)} 
+                className={`w-12 h-12 rounded-full border-2 transition-all ${avatarUrl === url ? 'border-[#C45A2A] scale-110' : 'border-transparent opacity-50'}`}>
+                <img src={url} alt="av" className="w-full h-full rounded-full" />
+              </button>
             ))}
           </div>
-          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Ім'я" className="w-full p-3 bg-[#121212] border border-[#333333] rounded-lg text-white" required />
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" className="w-full p-3 bg-[#121212] border border-[#333333] rounded-lg text-white" required />
+          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Ім'я" className="w-full p-3 bg-[#121212] border border-[#333333] rounded-lg text-white outline-none focus:border-[#C45A2A]" required />
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" className="w-full p-3 bg-[#121212] border border-[#333333] rounded-lg text-white outline-none focus:border-[#C45A2A]" required />
           <div className="relative">
-            <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Пароль" className="w-full p-3 bg-[#121212] border border-[#333333] rounded-lg text-white" required />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A8278]">
+            <input type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Пароль" className="w-full p-3 bg-[#121212] border border-[#333333] rounded-lg text-white outline-none focus:border-[#C45A2A]" required />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A8278] hover:text-white transition-colors">
               {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
             </button>
           </div>
-          <button type="submit" className="w-full py-3 bg-[#2E7D32] text-white font-bold rounded-lg transition-all">Увійти</button>
+          <button type="submit" className="w-full py-4 bg-[#2E7D32] text-white font-bold rounded-lg hover:bg-[#236026] transition-all uppercase tracking-widest text-xs mt-2">Увійти в систему</button>
         </form>
       </div>
     </div>
