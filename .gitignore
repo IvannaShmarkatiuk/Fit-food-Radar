@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 /backend/FitFood.API/appsettings.json
+/backend/.vs
+/backend/FitFood.API/bin
+/backend/FitFood.API/obj
+/backend/FitFood.API/Properties/PublishProfiles/IISProfile.pubxml.user
+/backend/FitFood.API/FitFood.API.csproj.user

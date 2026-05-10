@@ -20,6 +20,7 @@ namespace FitFood.API.Controllers
         public async Task<IActionResult> GetReviews(int restaurantId)
         {
             var reviews = await _context.Reviews
+                .Include(r => r.User)
                 .Where(r => r.RestaurantId == restaurantId)
                 .ToListAsync();
             return Ok(reviews);
