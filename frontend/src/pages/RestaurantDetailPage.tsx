@@ -1,9 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { MapPinIcon, ArrowLeftIcon, StarIcon } from 'lucide-react';
 import { ReviewSection } from '../components/ReviewSection';
-import { mockRestaurants } from '../data/restaurants';
-import { mockReviews } from '../data/reviews';
+import { Restaurant } from '../types'; 
 
 export interface ExtendedReview {
   id: string;
@@ -24,31 +23,92 @@ interface RestaurantDetailPageProps {
 }
 
 export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvatar, isLoggedIn }: RestaurantDetailPageProps) {
-  const restaurant = mockRestaurants.find((r) => r.id === restaurantId) || mockRestaurants[0];
+  const API_URL = import.meta.env.VITE_API_URL || 'http://fitfood.runasp.net';
   
-  // Стейт для списку відгуків
-  const [reviews, setReviews] = useState<ExtendedReview[]>(mockReviews[restaurant.id] || []);
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [reviews, setReviews] = useState<ExtendedReview[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Динамічний підрахунок рейтингу
+  // Завантаження даних з бекенду
+  useEffect(() => {
+    const fetchAllData = async () => {
+      setIsLoading(true);
+      try {
+       
+        const res = await fetch(`${API_URL}/api/Restaurants/${restaurantId}`);
+        const restaurantData = await res.json();
+        setRestaurant(restaurantData);
+
+        // Отримуємо відгуки саме для цього закладу
+        const reviewsRes = await fetch(`${API_URL}/api/Reviews/restaurant/${restaurantId}`);
+        const reviewsData = await reviewsRes.json();
+        
+  
+        const mappedReviews = reviewsData.map((rev: any) => ({
+          id: rev.id.toString(),
+          visitorName: rev.userName || "Гість", 
+          date: new Date(rev.createdAt).toLocaleDateString('uk-UA'),
+          text: rev.comment,
+          rating: rev.rating,
+          avatarColor: 'bg-[#C45A2A]',
+          avatarUrl: null
+        }));
+        
+        setReviews(mappedReviews);
+      } catch (e) {
+        console.error("Помилка завантаження деталей:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (restaurantId) fetchAllData();
+  }, [restaurantId, API_URL]);
+
+ 
   const currentRating = useMemo(() => {
-    if (reviews.length === 0) return 0;
+    if (reviews.length === 0) return restaurant?.rating || 0;
     const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
     return (sum / reviews.length).toFixed(1);
-  }, [reviews]);
+  }, [reviews, restaurant]);
 
-  const handleAddReview = (text: string, rating: number) => {
-    const newReview: ExtendedReview = {
-      id: Date.now().toString(),
-      visitorName: userName,
-      date: 'Щойно',
-      text: text,
-      avatarColor: 'bg-[#2E7D32]',
-      avatarUrl: userAvatar,
-      rating: rating
+
+  const handleAddReview = async (text: string, rating: number) => {
+    const reviewToSend = {
+      rating: rating,
+      comment: text,
+      userId: 1, 
+      restaurantId: parseInt(restaurantId),
+      createdAt: new Date().toISOString()
     };
-    
-    setReviews([newReview, ...reviews]);
+
+    try {
+      const res = await fetch(`${API_URL}/api/Reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewToSend)
+      });
+
+      if (res.ok) {
+        
+        const newReview: ExtendedReview = {
+          id: Date.now().toString(),
+          visitorName: userName || "Я",
+          date: 'Щойно',
+          text: text,
+          avatarColor: 'bg-[#2E7D32]',
+          avatarUrl: userAvatar,
+          rating: rating
+        };
+        setReviews([newReview, ...reviews]);
+      }
+    } catch (e) {
+      console.error("Не вдалося надіслати відгук:", e);
+    }
   };
+
+  if (isLoading) return <div className="text-center py-20 text-[#B8B0A0]">Завантаження смаколиків...</div>;
+  if (!restaurant) return <div className="text-center py-20 text-[#B8B0A0]">Заклад не знайдено 🍕</div>;
 
   return (
     <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-[1440px] mx-auto pb-20">
@@ -56,11 +116,11 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
         {restaurant.imageUrl ? (
           <img src={restaurant.imageUrl} alt={restaurant.name} className="w-full h-full object-cover" />
         ) : (
-          <div className={`w-full h-full bg-gradient-to-br ${restaurant.imageColor}`} />
+          <div className="w-full h-full bg-gradient-to-br from-[#2E7D32] to-[#1A1A1A]" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#121212] to-transparent opacity-80" />
         <button onClick={onBack} className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-black/40 hover:bg-black/60 backdrop-blur-md text-[#EDE8D0] rounded-lg border border-white/10 transition-colors">
-          <ArrowLeftIcon className="w-4 h-4" /><span>Назад до закладів</span>
+          <ArrowLeftIcon className="w-4 h-4" /><span>Назад до закладу</span>
         </button>
       </div>
 
@@ -82,9 +142,12 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
         </div>
 
         <div className="flex gap-3 mb-12">
-          {restaurant.tags.map((tag) => (
-            <span key={tag} className="px-4 py-1.5 bg-[#252525] text-[#EDE8D0] rounded-full border border-[#333333] font-medium">{tag}</span>
-          ))}
+          {}
+          {restaurant.categories?.map((cat: any) => (
+            <span key={cat.id} className="px-4 py-1.5 bg-[#252525] text-[#EDE8D0] rounded-full border border-[#333333] font-medium">
+              {cat.name}
+            </span>
+          )) || <span className="text-[#8A8278]">Смачна їжа</span>}
         </div>
 
         <ReviewSection reviews={reviews} onAddReview={handleAddReview} isLoggedIn={isLoggedIn} />

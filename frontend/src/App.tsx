@@ -9,7 +9,7 @@ import { Restaurant } from './types';
 export function App() {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:7231';
 
-  // 1. Всі хуки стану мають бути ТУТ (на самому верху)
+ 
   const [currentPage, setCurrentPage] = useState<'catalog' | 'detail' | 'favorites'>('catalog');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -27,7 +27,7 @@ export function App() {
     setIsLoading(true);
     setError(null); 
 
-    fetch(`${API_URL}/api/Restaurant`)
+    fetch(`${API_URL}/api/Restaurants`)
       .then(res => {
         if (!res.ok) throw new Error("Сервер Майї відпочиває");
         return res.json();
