@@ -5,6 +5,5 @@ export interface Restaurant {
   rating: number;
   imageUrl?: string | null;
   mapImageUrl?: string | null;
-  categories?: { id: number; name: string }[];
-  tags?: string[]; // для сумісності
+  categories?: { id: number; name: string }[] | string[];
 }
