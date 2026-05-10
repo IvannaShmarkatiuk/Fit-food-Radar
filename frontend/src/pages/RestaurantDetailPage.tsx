@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { MapPinIcon, ArrowLeftIcon, StarIcon } from 'lucide-react';
 import { ReviewSection } from '../components/ReviewSection';
 
-
 interface ApiRestaurant {
   id: number;
   name: string;
@@ -54,27 +53,32 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
           const reviewsRes = await fetch(`${API_URL}/api/Reviews/restaurant/${restaurantId}`);
           if (reviewsRes.ok) {
             const reviewsData = await reviewsRes.json();
-            const mappedReviews = reviewsData.map((rev: any) => ({
-              id: rev.id.toString(),
-              visitorName: rev.userName || "Гість", 
-              date: new Date(rev.createdAt).toLocaleDateString('uk-UA'),
-              text: rev.comment,
-              rating: rev.rating,
-              avatarColor: 'bg-[#C45A2A]',
-              avatarUrl: null
-            }));
+            
+            // ТУТ ПРАВИЛЬНА ЛОГІКА МАПІНГУ
+            const mappedReviews = reviewsData.map((rev: any) => {
+              const isMe = rev.userId === 1; // Твій ID на бекенді
+              return {
+                id: rev.id.toString(),
+                visitorName: isMe ? userName : (rev.userName || "Гість"), 
+                date: new Date(rev.createdAt).toLocaleDateString('uk-UA'),
+                text: rev.comment,
+                rating: rev.rating,
+                avatarColor: isMe ? 'bg-[#2E7D32]' : 'bg-[#C45A2A]',
+                avatarUrl: isMe ? userAvatar : null 
+              };
+            });
             setReviews(mappedReviews);
           }
         }
       } catch (e) {
-        console.error(e);
+        console.error("Помилка завантаження:", e);
       } finally {
         setIsLoading(false);
       }
     };
 
     if (restaurantId) fetchAllData();
-  }, [restaurantId, API_URL]);
+  }, [restaurantId, API_URL, userName, userAvatar]);
 
   const currentRating = useMemo(() => {
     if (reviews.length === 0) return restaurant?.rating || 0;
@@ -117,7 +121,6 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
 
   const getValidImageUrl = (url: string | undefined | null) => {
     if (!url) return null;
-    // Якщо в полі лежить просто назва закладу (як ми бачили "Буфет"), а не посилання
     if (!url.startsWith('http') && !url.startsWith('/')) return null;
     return url;
   };

@@ -11,20 +11,20 @@ interface RestaurantCardProps {
 }
 
 export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavorite }: RestaurantCardProps) {
-  // Випадкове смачне фото (fallback)
+ 
   const defaultImage = "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
 
   return (
     <div onClick={onClick} className="bg-[#1A1A1A] border border-[#333333] rounded-2xl overflow-hidden cursor-pointer group hover:border-[#4A4A4A] transition-all hover:shadow-2xl hover:shadow-black/50 flex flex-col h-full relative">
       
-      {/* Блок з картинкою */}
+      {}
       <div className="h-[200px] w-full relative overflow-hidden bg-[#1A1A1A]">
         <img 
-          // Якщо бекенд дав картинку - пробуємо її. Якщо ні - беремо нашу defaultImage
+          
           src={restaurant.imageUrl ? restaurant.imageUrl : defaultImage} 
           alt={restaurant.name} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-          // Магія: якщо Майя передала посилання, але воно бите, перемикаємо на defaultImage
+         
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = defaultImage;
@@ -57,7 +57,7 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
           <span className="truncate">{restaurant.address}</span>
         </div>
 
-        {/* Захист: якщо тегів немає, map не зламає сайт */}
+        {}
         <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-[#333333]">
           {restaurant.tags && restaurant.tags.map((tag) => (
             <span key={tag} className="text-xs font-medium text-[#B8B0A0] bg-[#252525] px-2.5 py-1 rounded-md">{tag}</span>

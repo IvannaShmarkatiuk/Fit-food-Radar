@@ -7,9 +7,8 @@ import { EditProfileModal } from './components/EditProfileModal';
 import { Restaurant } from './types';
 
 export function App() {
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:7231';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://fitfood.runasp.net';
 
- 
   const [currentPage, setCurrentPage] = useState<'catalog' | 'detail' | 'favorites'>('catalog');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -21,7 +20,7 @@ export function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); // Стан для помилки
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -37,7 +36,6 @@ export function App() {
         setIsLoading(false);
       })
       .catch(err => {
-        console.error("API Error:", err);
         setError("Майя, де бекенд? 🍕 Здається, сервер не запущено.");
         setIsLoading(false);
       });
@@ -48,18 +46,19 @@ export function App() {
       setShowLoginModal(true);
       return;
     }
-    const isFav = favorites.includes(id);
+    const isFav = favorites.includes(id.toString());
     try {
       if (isFav) {
+       
         await fetch(`${API_URL}/api/Favorites/1/${id}`, { method: 'DELETE' });
-        setFavorites(prev => prev.filter(fId => fId !== id));
+        setFavorites(prev => prev.filter(fId => fId !== id.toString()));
       } else {
         const res = await fetch(`${API_URL}/api/Favorites`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: 1, restaurantId: parseInt(id) })
         });
-        if (res.ok) setFavorites(prev => [...prev, id]);
+        if (res.ok) setFavorites(prev => [...prev, id.toString()]);
       }
     } catch (e) { console.error("Favorite toggle error:", e); }
   };
@@ -112,40 +111,38 @@ export function App() {
         onEditProfileClick={() => setShowEditModal(true)}
       />
 
-      {/* Рендеримо каталог або повідомлення про помилку */}
-      {currentPage === 'catalog' && (
-        error ? (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-            <h2 className="text-3xl font-bold text-[#EDE8D0] mb-4">{error}</h2>
-            <p className="text-[#8A8278] mb-8">Майя, ми чекаємо на твій Swagger! 🚀</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="px-8 py-3 bg-[#2E7D32] text-[#EDE8D0] rounded-xl font-bold hover:bg-[#388E3C] transition-all active:scale-95"
-            >
-              Спробувати підключитись 🔄
-            </button>
-          </div>
-        ) : (
-          <CatalogPage 
-            onRestaurantClick={handleRestaurantClick} 
-            favorites={favorites} 
-            toggleFavorite={toggleFavorite}
-            searchQuery={searchQuery}
-            restaurants={restaurants}
-            isLoading={isLoading}
-          />
-        )
-      )}
+      <main className="pt-20"> {}
+        {currentPage === 'catalog' && (
+          error ? (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
+              <h2 className="text-3xl font-bold text-[#EDE8D0] mb-4">{error}</h2>
+              <button onClick={() => window.location.reload()} className="px-8 py-3 bg-[#2E7D32] text-[#EDE8D0] rounded-xl font-bold hover:bg-[#388E3C] transition-all">
+                Спробувати підключитись 🔄
+              </button>
+            </div>
+          ) : (
+            <CatalogPage 
+              onRestaurantClick={handleRestaurantClick} 
+              favorites={favorites} 
+              toggleFavorite={toggleFavorite}
+              searchQuery={searchQuery}
+              restaurants={restaurants}
+              isLoading={isLoading}
+            />
+          )
+        )}
 
-      {currentPage === 'detail' && selectedRestaurantId && (
-        <RestaurantDetailPage 
-          restaurantId={selectedRestaurantId} 
-          onBack={handleBackToCatalog} 
-          userName={userName} 
-          userAvatar={userAvatar} 
-          isLoggedIn={isLoggedIn} 
-        />
-      )}
+        {currentPage === 'detail' && selectedRestaurantId && (
+          <RestaurantDetailPage 
+            restaurantId={selectedRestaurantId} 
+            onBack={handleBackToCatalog} 
+            userName={userName} 
+            userAvatar={userAvatar} 
+            isLoggedIn={isLoggedIn} 
+          />
+        )}
+      </main>
+
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} onLogin={handleLogin} />
       <EditProfileModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} onSave={handleEditProfile} currentName={userName} currentAvatar={userAvatar} />
     </div>
