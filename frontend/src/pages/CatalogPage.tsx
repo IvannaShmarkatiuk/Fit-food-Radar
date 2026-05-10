@@ -1,67 +1,71 @@
-import React, { useState } from 'react';
-import { Sidebar } from '../components/Sidebar';
+import React from 'react';
+import { Restaurant } from '../types';
 import { RestaurantCard } from '../components/RestaurantCard';
-import { mockRestaurants } from '../data/restaurants';
 
 interface CatalogPageProps {
   onRestaurantClick: (id: string) => void;
   favorites: string[];
   toggleFavorite: (id: string) => void;
   searchQuery: string;
+  restaurants: Restaurant[];
+  isLoading: boolean;
 }
 
-export function CatalogPage({ onRestaurantClick, favorites, toggleFavorite, searchQuery }: CatalogPageProps) {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+export const CatalogPage: React.FC<CatalogPageProps> = ({ 
+  onRestaurantClick, 
+  favorites, 
+  toggleFavorite, 
+  searchQuery,
+  restaurants,
+  isLoading 
+}) => {
+  const filtered = restaurants.filter(r => 
+    r.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const handleCategoryToggle = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category) 
-        : [...prev, category]
-    );
-  };
-
-  const filteredRestaurants = mockRestaurants.filter((restaurant) => {
-    const matchesSearch = 
-      restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      restaurant.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      
-    const matchesCategories = 
-      selectedCategories.length === 0 || 
-      restaurant.tags.some(tag => selectedCategories.includes(tag));
-      
-    return matchesSearch && matchesCategories;
-  });
+  if (isLoading) return <div className="text-center py-20 text-[#EDE8D0]">Завантаження смачненького...</div>;
 
   return (
-    <main className="max-w-[1440px] mx-auto px-8 py-8 flex gap-8 relative items-start">
-      <Sidebar 
-        selectedCategories={selectedCategories} 
-        onCategoryToggle={handleCategoryToggle} 
-      />
-      <div className="flex-1">
-        {filteredRestaurants.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-[#1A1A1A] rounded-2xl border border-[#333333]">
-            <p className="text-2xl font-bold text-[#EDE8D0] mb-2">Нічого не знайдено 😕</p>
-            <p className="text-[#8A8278]">Спробуйте змінити критерії пошуку або зняти деякі фільтри.</p>
+    <main className="max-w-[1440px] mx-auto px-8 py-12 flex gap-8">
+      {/* ЛІВА ЧАСТИНА: Слайд-бар / Фільтри */}
+      <aside className="w-64 flex-shrink-0 hidden lg:block">
+        <div className="sticky top-24 space-y-8">
+          <div>
+            <h3 className="text-[#EDE8D0] font-bold mb-4 uppercase tracking-widest text-xs opacity-50">Категорії</h3>
+            <div className="space-y-2">
+              {['Всі заклади', 'Сніданки', 'Обід', 'Вечеря', 'Корисне'].map(cat => (
+                <button key={cat} className="block w-full text-left px-4 py-2 rounded-lg text-[#8A8278] hover:bg-[#1A1A1A] hover:text-[#EDE8D0] transition-all">
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredRestaurants.map((restaurant) => (
-              <RestaurantCard
-                key={restaurant.id}
-                restaurant={restaurant}
-                onClick={() => onRestaurantClick(restaurant.id)}
-                isFavorite={favorites.includes(restaurant.id)}
-                onToggleFavorite={(e) => {
-                  e.stopPropagation();
-                  toggleFavorite(restaurant.id);
-                }}
-              />
-            ))}
+          <div className="p-6 bg-[#1A1A1A] rounded-2xl border border-[#333333]">
+            <p className="text-sm text-[#8A8278]">Обирай найкращі заклади поблизу твого університету! 🎓</p>
           </div>
-        )}
+        </div>
+      </aside>
+
+      {/* ПРАВА ЧАСТИНА: Сітка ресторанів */}
+      <div className="flex-grow">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filtered.map(r => (
+            <RestaurantCard 
+              key={r.id} 
+              restaurant={{
+                ...r,
+                id: r.id.toString() as any 
+              }} 
+              onClick={() => onRestaurantClick(r.id.toString())} 
+              isFavorite={favorites.includes(r.id.toString())} 
+              onToggleFavorite={(e) => { 
+                e.stopPropagation(); 
+                toggleFavorite(r.id.toString()); 
+              }} 
+            />
+          ))}
+        </div>
       </div>
     </main>
   );
-}
+};

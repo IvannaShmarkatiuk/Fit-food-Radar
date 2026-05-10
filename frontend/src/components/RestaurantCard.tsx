@@ -1,6 +1,7 @@
 import React from 'react';
 import { StarIcon, MapPinIcon, HeartIcon } from 'lucide-react';
-import { Restaurant } from '../data/restaurants';
+// УВАГА: Ми змінили імпорт типу! Тепер він береться зі спільного файлу types.ts, а не з моків.
+import { Restaurant } from '../types'; 
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -10,14 +11,25 @@ interface RestaurantCardProps {
 }
 
 export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavorite }: RestaurantCardProps) {
+ 
+  const defaultImage = "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80";
+
   return (
     <div onClick={onClick} className="bg-[#1A1A1A] border border-[#333333] rounded-2xl overflow-hidden cursor-pointer group hover:border-[#4A4A4A] transition-all hover:shadow-2xl hover:shadow-black/50 flex flex-col h-full relative">
+      
+      {}
       <div className="h-[200px] w-full relative overflow-hidden bg-[#1A1A1A]">
-        {restaurant.imageUrl ? (
-          <img src={restaurant.imageUrl} alt={restaurant.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-        ) : (
-          <div className={`w-full h-full bg-gradient-to-br ${restaurant.imageColor}`} />
-        )}
+        <img 
+          
+          src={restaurant.imageUrl ? restaurant.imageUrl : defaultImage} 
+          alt={restaurant.name} 
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+         
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = defaultImage;
+          }}
+        />
         <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300" />
       </div>
 
@@ -45,8 +57,9 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
           <span className="truncate">{restaurant.address}</span>
         </div>
 
+        {}
         <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-[#333333]">
-          {restaurant.tags.map((tag) => (
+          {restaurant.tags && restaurant.tags.map((tag) => (
             <span key={tag} className="text-xs font-medium text-[#B8B0A0] bg-[#252525] px-2.5 py-1 rounded-md">{tag}</span>
           ))}
         </div>

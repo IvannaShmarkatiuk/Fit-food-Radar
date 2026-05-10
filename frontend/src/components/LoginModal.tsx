@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { XIcon } from 'lucide-react';
+import { XIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 
 const PRESET_AVATARS = [
   'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
@@ -25,6 +25,7 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(PRESET_AVATARS[0]);
 
   if (!isOpen) return null;
@@ -79,7 +80,23 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
 
             <div>
               <label className="block text-sm font-medium text-[#B8B0A0] mb-2">Пароль</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] transition-all" required />
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  placeholder="••••••••" 
+                  className="w-full px-4 py-3 bg-[#121212] border border-[#333333] rounded-lg text-[#EDE8D0] placeholder-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#C45A2A] transition-all" 
+                  required 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A8278] hover:text-[#EDE8D0]"
+                >
+                  {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+                </button>
+              </div>
             </div>
             
             <button type="submit" className="w-full py-3 mt-4 bg-[#2E7D32] hover:bg-[#236026] text-[#EDE8D0] font-bold rounded-lg transition-colors">
