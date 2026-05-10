@@ -1,189 +1,108 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { MapPinIcon, ArrowLeftIcon, StarIcon } from 'lucide-react';
+import { ArrowLeftIcon, MapPinIcon, StarIcon } from 'lucide-react';
 import { ReviewSection } from '../components/ReviewSection';
 
-interface ApiRestaurant {
-  id: number;
-  name: string;
-  address: string;
-  rating: number;
-  imageUrl?: string | null;
-  mapImageUrl?: string | null; 
-  categories?: { id: number; name: string }[];
-}
-
-export interface ExtendedReview {
-  id: string;
-  visitorName: string;
-  date: string;
-  text: string;
-  avatarColor: string;
-  avatarUrl?: string | null;
-  rating: number;
-}
-
-interface RestaurantDetailPageProps {
-  restaurantId: string;
-  onBack: () => void;
-  userName: string;
-  userAvatar: string | null;
-  isLoggedIn: boolean;
-}
-
-export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvatar, isLoggedIn }: RestaurantDetailPageProps) {
+export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvatar, isLoggedIn }: any) {
   const API_URL = import.meta.env.VITE_API_URL || 'http://fitfood.runasp.net';
-  
-  const [restaurant, setRestaurant] = useState<ApiRestaurant | null>(null);
-  const [reviews, setReviews] = useState<ExtendedReview[]>([]);
+  const [restaurant, setRestaurant] = useState<any>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAllData = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       try {
         const res = await fetch(`${API_URL}/api/Restaurants`);
-        const allRestaurants = await res.json();
-        
-        const found = allRestaurants.find((r: any) => r.id === Number(restaurantId));
-        
+        const data = await res.json();
+        const found = data.find((r: any) => r.id === Number(restaurantId));
         if (found) {
           setRestaurant(found);
-
-          const reviewsRes = await fetch(`${API_URL}/api/Reviews/restaurant/${restaurantId}`);
-          if (reviewsRes.ok) {
-            const reviewsData = await reviewsRes.json();
-            
-            // ТУТ ПРАВИЛЬНА ЛОГІКА МАПІНГУ
-            const mappedReviews = reviewsData.map((rev: any) => {
-              const isMe = rev.userId === 1; // Твій ID на бекенді
-              return {
-                id: rev.id.toString(),
-                visitorName: isMe ? userName : (rev.userName || "Гість"), 
-                date: new Date(rev.createdAt).toLocaleDateString('uk-UA'),
-                text: rev.comment,
-                rating: rev.rating,
-                avatarColor: isMe ? 'bg-[#2E7D32]' : 'bg-[#C45A2A]',
-                avatarUrl: isMe ? userAvatar : null 
-              };
-            });
-            setReviews(mappedReviews);
+          const revRes = await fetch(`${API_URL}/api/Reviews/restaurant/${restaurantId}`);
+          if (revRes.ok) {
+            const revData = await revRes.json();
+            setReviews(revData.map((rev: any) => ({
+              id: rev.id.toString(),
+              visitorName: rev.userId === 1 ? userName : (rev.userName || rev.UserName || "Гість"),
+              date: new Date(rev.createdAt || rev.CreatedAt).toLocaleDateString('uk-UA'),
+              text: rev.comment || rev.Comment,
+              rating: rev.rating || rev.Rating,
+              avatarUrl: rev.userId === 1 ? userAvatar : (rev.userAvatar || rev.UserAvatar || null)
+            })));
           }
         }
-      } catch (e) {
-        console.error("Помилка завантаження:", e);
-      } finally {
-        setIsLoading(false);
-      }
+      } catch (e) { console.error(e); }
+      finally { setIsLoading(false); }
     };
-
-    if (restaurantId) fetchAllData();
+    fetchData();
   }, [restaurantId, API_URL, userName, userAvatar]);
 
-  const currentRating = useMemo(() => {
-    if (reviews.length === 0) return restaurant?.rating || 0;
-    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
-    return (sum / reviews.length).toFixed(1);
-  }, [reviews, restaurant]);
-
   const handleAddReview = async (text: string, rating: number) => {
-    const reviewToSend = {
+    // ВАЖЛИВО: Додаємо User: null та Restaurant: null, щоб обійти валідацію бекенду
+    const body = {
       rating: rating,
       comment: text,
       userId: 1, 
-      restaurantId: parseInt(restaurantId),
-      createdAt: new Date().toISOString()
+      restaurantId: Number(restaurantId),
+      createdAt: new Date().toISOString(),
+      user: null,
+      restaurant: null
     };
 
     try {
       const res = await fetch(`${API_URL}/api/Reviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reviewToSend)
+        body: JSON.stringify(body)
       });
 
       if (res.ok) {
-        const newReview: ExtendedReview = {
-          id: Date.now().toString(),
-          visitorName: userName || "Я",
-          date: 'Щойно',
-          text: text,
-          avatarColor: 'bg-[#2E7D32]',
-          avatarUrl: userAvatar,
-          rating: rating
-        };
-        setReviews([newReview, ...reviews]);
+        window.location.reload();
+      } else {
+        const errorText = await res.text();
+        alert(`Помилка: ${errorText}`);
       }
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
   };
 
-  const getValidImageUrl = (url: string | undefined | null) => {
-    if (!url) return null;
-    if (!url.startsWith('http') && !url.startsWith('/')) return null;
-    return url;
-  };
+  const currentRating = useMemo(() => {
+    if (reviews.length === 0) return restaurant?.rating || (restaurant as any)?.Rating || 0;
+    const sum = reviews.reduce((acc, rev) => acc + rev.rating, 0);
+    return (sum / reviews.length).toFixed(1);
+  }, [reviews, restaurant]);
 
-  if (isLoading) return <div className="text-center py-20 text-[#B8B0A0]">Завантаження смаколиків...</div>;
-  if (!restaurant) return <div className="text-center py-20 text-[#B8B0A0]">Заклад не знайдено 🍕</div>;
+  if (isLoading || !restaurant) return <div className="text-center py-40 text-white">Вантажимо...</div>;
 
-  const validMainImage = getValidImageUrl(restaurant.imageUrl);
-  const validMapImage = getValidImageUrl(restaurant.mapImageUrl);
+  const rawImg = restaurant.imageUrl || restaurant.ImageUrl;
+  const img = rawImg && (rawImg.startsWith('/') || rawImg.startsWith('http')) ? rawImg : "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200";
 
   return (
-    <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-[1440px] mx-auto pb-20">
-      <div className="w-full h-[400px] relative bg-[#1A1A1A]">
-        {validMainImage ? (
-          <img src={validMainImage} alt={restaurant.name} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#2E7D32] to-[#121212] flex items-center justify-center">
-            <span className="text-[#8A8278] italic text-lg">Фото закладу незабаром</span>
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#121212] to-transparent opacity-90" />
-        <button onClick={onBack} className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-black/40 hover:bg-black/60 backdrop-blur-md text-[#EDE8D0] rounded-lg border border-white/10 transition-colors z-20">
-          <ArrowLeftIcon className="w-4 h-4" /><span>Назад до закладу</span>
+    <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-[1440px] mx-auto pb-20">
+      <div className="w-full h-[300px] relative bg-[#1A1A1A]">
+        <img src={img} alt="hero" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#121212] opacity-80" />
+        <button onClick={onBack} className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-black/40 rounded-lg text-white z-20 backdrop-blur-md border border-white/10">
+          <ArrowLeftIcon size={16} /> Назад
         </button>
       </div>
-
-      <div className="px-8 -mt-20 relative z-10">
-        <div className="flex justify-between items-end mb-8">
-          <div>
-            <div className="flex items-center gap-4 mb-4">
-              <h1 className="text-6xl font-bold text-[#EDE8D0] tracking-tight">{restaurant.name}</h1>
-              <div className="flex items-center gap-1.5 bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[#333333] shadow-2xl">
-                <StarIcon className="w-6 h-6 text-[#C45A2A] fill-[#C45A2A]" />
-                <span className="text-[#EDE8D0] font-bold text-xl">{currentRating}</span>
-                <span className="text-[#8A8278] text-sm font-normal ml-1">({reviews.length})</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 text-[#B8B0A0] text-xl">
-              <MapPinIcon className="w-6 h-6 text-[#C45A2A]" /><span>{restaurant.address}</span>
-            </div>
+      <div className="px-8 -mt-12 relative z-10">
+        <div className="flex items-center gap-6 mb-4">
+          <h1 className="text-5xl font-bold text-white tracking-tight">{restaurant.name || restaurant.Name}</h1>
+          <div className="bg-[#1A1A1A] border border-[#333333] px-4 py-2 rounded-xl flex items-center gap-2 shadow-2xl">
+             <StarIcon size={20} className="text-[#C45A2A] fill-[#C45A2A]" />
+             <span className="text-white font-bold text-xl">{currentRating}</span>
           </div>
         </div>
-
-        <div className="flex gap-3 mb-12">
-          {restaurant.categories?.map((cat: any) => (
-            <span key={cat.id} className="px-5 py-2 bg-[#1A1A1A] text-[#EDE8D0] rounded-full border border-[#333333] font-medium text-sm uppercase tracking-wider">
-              {cat.name}
+        <p className="flex items-center gap-2 text-[#B8B0A0] text-lg mb-12">
+          <MapPinIcon className="text-[#C45A2A]" size={20} /> {restaurant.address || restaurant.Address}
+        </p>
+        
+        <div className="flex flex-wrap gap-2 mb-12">
+          {((restaurant as any).categories || (restaurant as any).Categories)?.map((cat: string) => (
+            <span key={cat} className="px-5 py-2 bg-[#1A1A1A] text-[#EDE8D0] rounded-full border border-[#333333] font-medium text-xs uppercase tracking-widest">
+              {cat}
             </span>
-          )) || <span className="px-5 py-2 bg-[#1A1A1A] text-[#8A8278] rounded-full border border-[#333333] font-medium text-sm">FIT FOOD</span>}
-        </div>
-
-        <div className="mb-16">
-          <h3 className="text-[#EDE8D0] font-bold mb-6 uppercase tracking-[0.2em] text-xs opacity-50">Локація закладу</h3>
-          <div className="w-full h-[350px] rounded-3xl overflow-hidden border border-[#333333] bg-[#1A1A1A] relative shadow-2xl">
-            {validMapImage ? (
-              <img src={validMapImage} alt="Мапа" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center gap-4">
-                <MapPinIcon className="w-12 h-12 text-[#333333]" />
-                <span className="text-[#333333] font-medium">Карта завантажується...</span>
-              </div>
-            )}
-          </div>
+          ))}
         </div>
 
         <ReviewSection reviews={reviews} onAddReview={handleAddReview} isLoggedIn={isLoggedIn} />
