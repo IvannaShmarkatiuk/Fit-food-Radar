@@ -35,14 +35,14 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     });
   }, [restaurants, searchQuery, activeCategory]);
 
-  if (isLoading) return <div className="text-center py-32 text-[#EDE8D0] animate-pulse">Завантаження каталогу...</div>;
+  if (isLoading) return <div className="text-center py-20 text-[#EDE8D0]">Завантаження каталогу...</div>;
 
   return (
     <main className="max-w-[1440px] mx-auto px-8 py-12 flex flex-col lg:flex-row gap-12">
       <aside className="w-full lg:w-64 flex-shrink-0">
         <div className="sticky top-28">
           <div className="flex items-center gap-2 mb-6 text-[#C45A2A]">
-            <FilterIcon size={18} /> <h3 className="text-[#EDE8D0] font-bold uppercase text-[10px] tracking-widest">Фільтри</h3>
+            <FilterIcon size={18} /> <h3 className="text-[#EDE8D0] font-bold uppercase text-[10px] tracking-widest">Категорії страв</h3>
           </div>
           <div className="flex flex-wrap lg:flex-col gap-1">
             {categories.map(cat => (
