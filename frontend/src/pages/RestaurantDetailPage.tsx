@@ -37,13 +37,13 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
   }, [restaurantId, API_URL]);
 
   const handleAddReview = async (text: string, rating: number) => {
-    // Спробуємо з маленької літери, як у Swagger
+    // ЗМІНЕНО НА ВЕЛИКІ ЛІТЕРИ (PascalCase) — це те, що зазвичай хоче .NET бекенд
     const body = {
-      rating: rating,
-      comment: text,
-      userId: 1, // Майя має перевірити, чи є в базі User з ID 1
-      restaurantId: Number(restaurantId),
-      createdAt: new Date().toISOString()
+      Rating: rating,
+      Comment: text,
+      UserId: 1, // МАЙЯ: Переконайся, що в базі є юзер з ID 1!
+      RestaurantId: Number(restaurantId),
+      CreatedAt: new Date().toISOString()
     };
 
     try {
@@ -68,9 +68,10 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
     return (sum / reviews.length).toFixed(1);
   }, [reviews, restaurant]);
 
-  if (isLoading || !restaurant) return <div className="text-center py-20 text-white">Завантаження...</div>;
+  if (isLoading || !restaurant) return <div className="text-center py-20 text-white">Вантажимо...</div>;
 
-  const img = restaurant.imageUrl || restaurant.ImageUrl || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200";
+  const rawImg = restaurant.imageUrl || restaurant.ImageUrl;
+  const img = rawImg && (rawImg.startsWith('/') || rawImg.startsWith('http')) ? rawImg : "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200";
 
   return (
     <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-[1440px] mx-auto pb-20">

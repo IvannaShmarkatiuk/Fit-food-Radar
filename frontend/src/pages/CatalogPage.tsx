@@ -35,19 +35,19 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
     });
   }, [restaurants, searchQuery, activeCategory]);
 
-  if (isLoading) return <div className="text-center py-20 text-[#EDE8D0] animate-pulse">Завантаження...</div>;
+  if (isLoading) return <div className="text-center py-20 text-[#EDE8D0] animate-pulse font-medium">Шукаємо затишні місця...</div>;
 
   return (
     <main className="max-w-[1440px] mx-auto px-8 py-12 flex flex-col lg:flex-row gap-12">
       <aside className="w-full lg:w-64 flex-shrink-0">
         <div className="sticky top-28">
           <div className="flex items-center gap-2 mb-6 text-[#C45A2A]">
-            <FilterIcon size={18} /> <h3 className="text-[#EDE8D0] font-bold uppercase text-[10px] tracking-[0.2em]">Категорії страв</h3>
+            <FilterIcon size={18} /> <h3 className="text-[#EDE8D0] font-bold uppercase text-[10px] tracking-widest">Категорії страв</h3>
           </div>
           <div className="flex flex-wrap lg:flex-col gap-1">
             {categories.map(cat => (
               <button key={cat} onClick={() => setActiveCategory(cat)} 
-                className={`px-4 py-2 rounded-xl text-left text-sm font-medium transition-all ${activeCategory === cat ? 'bg-[#C45A2A] text-white shadow-lg' : 'text-[#8A8278] hover:bg-[#1A1A1A] hover:text-[#EDE8D0]'}`}>
+                className={`px-4 py-2.5 rounded-xl text-left text-sm font-medium transition-all ${activeCategory === cat ? 'bg-[#C45A2A] text-white shadow-lg' : 'text-[#8A8278] hover:bg-[#1A1A1A] hover:text-[#EDE8D0]'}`}>
                 {cat}
               </button>
             ))}
@@ -55,7 +55,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({
         </div>
       </aside>
       <div className="flex-grow">
-        {/* items-start ВИПРАВЛЯЄ ДОВГІ КАРТКИ */}
+        {/* items-start ВИПРАВЛЯЄ ДОВЖИНУ КАРТОК */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 items-start">
           {filtered.map(r => (
             <RestaurantCard key={r.id} restaurant={r} onClick={() => onRestaurantClick(r.id.toString())} isFavorite={favorites.includes(r.id.toString())} onToggleFavorite={() => toggleFavorite(r.id.toString())} />

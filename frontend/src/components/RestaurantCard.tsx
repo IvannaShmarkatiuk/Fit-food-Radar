@@ -16,7 +16,6 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
   const rawImg = restaurant.imageUrl || (restaurant as any).ImageUrl;
   
   const defaultImg = "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80";
-  // Магія: якщо шлях починається з /, це локальна фотка Маші в папці public
   const finalImg = rawImg && (rawImg.startsWith('/') || rawImg.startsWith('http')) ? rawImg : defaultImg;
 
   return (
@@ -24,7 +23,6 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
       <div className="h-[200px] w-full relative overflow-hidden bg-[#1A1A1A]">
         <img src={finalImg} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
           onError={(e) => { (e.target as HTMLImageElement).src = defaultImg; }} />
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
       </div>
       <button onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(e); }} className="absolute top-3 right-3 p-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 z-10">
         <HeartIcon className={`w-4 h-4 ${isFavorite ? 'fill-[#ef4444] text-[#ef4444]' : 'text-white'}`} />
