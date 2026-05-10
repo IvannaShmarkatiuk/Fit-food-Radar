@@ -29,34 +29,35 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
   const [reviews, setReviews] = useState<ExtendedReview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Завантаження даних з бекенду
   useEffect(() => {
     const fetchAllData = async () => {
       setIsLoading(true);
       try {
-       
-        const res = await fetch(`${API_URL}/api/Restaurants/${restaurantId}`);
-        const restaurantData = await res.json();
-        setRestaurant(restaurantData);
+        const res = await fetch(`${API_URL}/api/Restaurants`);
+        const allRestaurants = await res.json();
+        
+        const found = allRestaurants.find((r: any) => r.id === Number(restaurantId));
+        
+        if (found) {
+          setRestaurant(found);
 
-        // Отримуємо відгуки саме для цього закладу
-        const reviewsRes = await fetch(`${API_URL}/api/Reviews/restaurant/${restaurantId}`);
-        const reviewsData = await reviewsRes.json();
-        
-  
-        const mappedReviews = reviewsData.map((rev: any) => ({
-          id: rev.id.toString(),
-          visitorName: rev.userName || "Гість", 
-          date: new Date(rev.createdAt).toLocaleDateString('uk-UA'),
-          text: rev.comment,
-          rating: rev.rating,
-          avatarColor: 'bg-[#C45A2A]',
-          avatarUrl: null
-        }));
-        
-        setReviews(mappedReviews);
+          const reviewsRes = await fetch(`${API_URL}/api/Reviews/restaurant/${restaurantId}`);
+          if (reviewsRes.ok) {
+            const reviewsData = await reviewsRes.json();
+            const mappedReviews = reviewsData.map((rev: any) => ({
+              id: rev.id.toString(),
+              visitorName: rev.userName || "Гість", 
+              date: new Date(rev.createdAt).toLocaleDateString('uk-UA'),
+              text: rev.comment,
+              rating: rev.rating,
+              avatarColor: 'bg-[#C45A2A]',
+              avatarUrl: null
+            }));
+            setReviews(mappedReviews);
+          }
+        }
       } catch (e) {
-        console.error("Помилка завантаження деталей:", e);
+        console.error(e);
       } finally {
         setIsLoading(false);
       }
@@ -65,13 +66,11 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
     if (restaurantId) fetchAllData();
   }, [restaurantId, API_URL]);
 
- 
   const currentRating = useMemo(() => {
     if (reviews.length === 0) return restaurant?.rating || 0;
     const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
     return (sum / reviews.length).toFixed(1);
   }, [reviews, restaurant]);
-
 
   const handleAddReview = async (text: string, rating: number) => {
     const reviewToSend = {
@@ -90,7 +89,6 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
       });
 
       if (res.ok) {
-        
         const newReview: ExtendedReview = {
           id: Date.now().toString(),
           visitorName: userName || "Я",
@@ -103,7 +101,7 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
         setReviews([newReview, ...reviews]);
       }
     } catch (e) {
-      console.error("Не вдалося надіслати відгук:", e);
+      console.error(e);
     }
   };
 
@@ -142,7 +140,6 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
         </div>
 
         <div className="flex gap-3 mb-12">
-          {}
           {restaurant.categories?.map((cat: any) => (
             <span key={cat.id} className="px-4 py-1.5 bg-[#252525] text-[#EDE8D0] rounded-full border border-[#333333] font-medium">
               {cat.name}
