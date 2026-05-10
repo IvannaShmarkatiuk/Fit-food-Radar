@@ -13,26 +13,31 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAll", policy => {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVercel",
+        policy =>
+        {
+            policy.WithOrigins("https://fit-food-radar.vercel.app") 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
 });
 
 var app = builder.Build();
 
-
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "FitFood API V1");
+    c.RoutePrefix = "swagger"; 
+});
+
+
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseCors("AllowVercel");
 
 app.UseAuthorization();
 
