@@ -38,15 +38,13 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
   }, [restaurantId, API_URL, userName, userAvatar]);
 
   const handleAddReview = async (text: string, rating: number) => {
-    // ВАЖЛИВО: Додаємо User: null та Restaurant: null, щоб обійти валідацію бекенду
+    // ТЕПЕР ТІЛЬКИ ID: Майя зробила User та Restaurant nullable!
     const body = {
       rating: rating,
       comment: text,
       userId: 1, 
       restaurantId: Number(restaurantId),
-      createdAt: new Date().toISOString(),
-      user: null,
-      restaurant: null
+      createdAt: new Date().toISOString()
     };
 
     try {
@@ -55,14 +53,18 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-
-      if (res.ok) {
-        window.location.reload();
-      } else {
+      if (res.ok) window.location.reload();
+      else {
         const errorText = await res.text();
-        alert(`Помилка: ${errorText}`);
+        alert(`Помилка сервера: ${errorText}`);
       }
     } catch (e) { console.error(e); }
+  };
+
+  const getImg = (url: string) => {
+    if (!url) return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200";
+    if (url.startsWith('http')) return url;
+    return `/${url.split('/').pop()}`; 
   };
 
   const currentRating = useMemo(() => {
@@ -73,36 +75,32 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
 
   if (isLoading || !restaurant) return <div className="text-center py-40 text-white">Вантажимо...</div>;
 
-  const rawImg = restaurant.imageUrl || restaurant.ImageUrl;
-  const img = rawImg && (rawImg.startsWith('/') || rawImg.startsWith('http')) ? rawImg : "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200";
-
   return (
     <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-[1440px] mx-auto pb-20">
-      <div className="w-full h-[300px] relative bg-[#1A1A1A]">
-        <img src={img} alt="hero" className="w-full h-full object-cover" />
+      <div className="w-full h-[350px] relative bg-[#1A1A1A]">
+        <img src={getImg(restaurant.imageUrl || restaurant.ImageUrl)} alt="hero" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#121212] opacity-80" />
-        <button onClick={onBack} className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-black/40 rounded-lg text-white z-20 backdrop-blur-md border border-white/10">
+        <button onClick={onBack} className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-black/40 rounded-lg text-white z-20 backdrop-blur-md border border-white/10 hover:bg-black/60 transition-all">
           <ArrowLeftIcon size={16} /> Назад
         </button>
       </div>
       <div className="px-8 -mt-12 relative z-10">
         <div className="flex items-center gap-6 mb-4">
           <h1 className="text-5xl font-bold text-white tracking-tight">{restaurant.name || restaurant.Name}</h1>
-          <div className="bg-[#1A1A1A] border border-[#333333] px-4 py-2 rounded-xl flex items-center gap-2 shadow-2xl">
-             <StarIcon size={20} className="text-[#C45A2A] fill-[#C45A2A]" />
-             <span className="text-white font-bold text-xl">{currentRating}</span>
+          <div className="bg-[#1A1A1A] border border-[#333333] px-3 py-1 rounded-lg flex items-center gap-2 shadow-xl">
+             <StarIcon size={18} className="text-[#C45A2A] fill-[#C45A2A]" />
+             <span className="text-white font-bold text-lg">{currentRating}</span>
           </div>
         </div>
         <p className="flex items-center gap-2 text-[#B8B0A0] text-lg mb-12">
-          <MapPinIcon className="text-[#C45A2A]" size={20} /> {restaurant.address || restaurant.Address}
+          <MapPinIcon className="text-[#C45A2A]" size={18} /> {restaurant.address || restaurant.Address}
         </p>
-        
-        <div className="flex flex-wrap gap-2 mb-12">
-          {((restaurant as any).categories || (restaurant as any).Categories)?.map((cat: string) => (
-            <span key={cat} className="px-5 py-2 bg-[#1A1A1A] text-[#EDE8D0] rounded-full border border-[#333333] font-medium text-xs uppercase tracking-widest">
-              {cat}
-            </span>
-          ))}
+
+        <div className="mb-16">
+          <h3 className="text-[#EDE8D0] font-bold mb-6 uppercase text-xs opacity-50 tracking-widest">Локація на карті</h3>
+          <div className="w-full h-[400px] rounded-3xl overflow-hidden border border-[#333333] shadow-2xl">
+            <img src={getImg(restaurant.mapImageUrl || restaurant.MapImageUrl)} className="w-full h-full object-cover" alt="map" />
+          </div>
         </div>
 
         <ReviewSection reviews={reviews} onAddReview={handleAddReview} isLoggedIn={isLoggedIn} />

@@ -16,7 +16,16 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
   const rawImg = restaurant.imageUrl || (restaurant as any).ImageUrl;
   
   const defaultImg = "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80";
-  const finalImg = rawImg && (rawImg.startsWith('/') || rawImg.startsWith('http')) ? rawImg : defaultImg;
+  
+  // Витягуємо тільки назву файлу, бо папок images/restaurants у public немає
+  let finalImg = defaultImg;
+  if (rawImg) {
+    if (rawImg.startsWith('http')) finalImg = rawImg;
+    else {
+      const fileName = rawImg.split('/').pop(); 
+      finalImg = `/${fileName}`; 
+    }
+  }
 
   return (
     <div onClick={onClick} className="bg-[#1A1A1A] border border-[#333333] rounded-2xl overflow-hidden cursor-pointer group hover:border-[#4A4A4A] transition-all flex flex-col relative shadow-lg">
@@ -24,7 +33,7 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
         <img src={finalImg} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
           onError={(e) => { (e.target as HTMLImageElement).src = defaultImg; }} />
       </div>
-      <button onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(e); }} className="absolute top-3 right-3 p-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 z-10">
+      <button onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(e); }} className="absolute top-3 right-3 p-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 z-10 transition-transform active:scale-90">
         <HeartIcon className={`w-4 h-4 ${isFavorite ? 'fill-[#ef4444] text-[#ef4444]' : 'text-white'}`} />
       </button>
       <div className="p-4 flex flex-col flex-grow">
@@ -39,7 +48,7 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
           <MapPinIcon size={12} className="flex-shrink-0" /> <span className="truncate">{address}</span>
         </div>
         <div className="flex flex-wrap gap-1 mt-auto">
-          {((restaurant as any).categories || (restaurant as any).Categories)?.map((cat: string) => (
+          {((restaurant as any).categories || (restaurant as any).Categories || [])?.map((cat: string) => (
             <span key={cat} className="text-[9px] uppercase font-bold text-[#C45A2A] bg-[#C45A2A]/10 px-2 py-0.5 rounded border border-[#C45A2A]/20">
               {cat}
             </span>

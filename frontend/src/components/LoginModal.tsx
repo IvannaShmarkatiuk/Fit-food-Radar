@@ -49,7 +49,7 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
         <button onClick={onClose} className="absolute top-4 right-4 text-[#8A8278] hover:text-[#EDE8D0]">
           <XIcon size={20} />
         </button>
-        <h2 className="text-2xl font-bold text-[#EDE8D0] mb-6 text-center">Вхід</h2>
+        <h2 className="text-2xl font-bold text-[#EDE8D0] mb-6 text-center uppercase tracking-widest">Вхід</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex justify-center gap-3 mb-6">
             {PRESET_AVATARS.map(url => (
