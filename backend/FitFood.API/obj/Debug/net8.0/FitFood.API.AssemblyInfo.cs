@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FitFood.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+67e5dd4e416de88adf03bdcd43b497b924b6215b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+71b1d0ba2facd203eaaae7390cb6daec7b66cf2a")]
 [assembly: System.Reflection.AssemblyProductAttribute("FitFood.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FitFood.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

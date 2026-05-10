@@ -44,41 +44,42 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
       try {
         const res = await fetch(`${API_URL}/api/Restaurants`);
         const allRestaurants = await res.json();
-        
         const found = allRestaurants.find((r: any) => r.id === Number(restaurantId));
         
         if (found) {
           setRestaurant(found);
-
           const reviewsRes = await fetch(`${API_URL}/api/Reviews/restaurant/${restaurantId}`);
           if (reviewsRes.ok) {
             const reviewsData = await reviewsRes.json();
             
-            // ТУТ ПРАВИЛЬНА ЛОГІКА МАПІНГУ
-            const mappedReviews = reviewsData.map((rev: any) => {
-              const isMe = rev.userId === 1; // Твій ID на бекенді
-              return {
-                id: rev.id.toString(),
-                visitorName: isMe ? userName : (rev.userName || "Гість"), 
-                date: new Date(rev.createdAt).toLocaleDateString('uk-UA'),
-                text: rev.comment,
-                rating: rev.rating,
-                avatarColor: isMe ? 'bg-[#2E7D32]' : 'bg-[#C45A2A]',
-                avatarUrl: isMe ? userAvatar : null 
-              };
-            });
+            // ТУТ ТЕПЕР ТІЛЬКИ ДАНІ З БАЗИ:
+            const mappedReviews = reviewsData.map((rev: any) => ({
+              id: rev.id.toString(),
+              visitorName: rev.userName || "Гість", // Беремо ім'я з бази
+              date: new Date(rev.createdAt).toLocaleDateString('uk-UA'),
+              text: rev.comment,
+              rating: rev.rating,
+              avatarColor: 'bg-[#C45A2A]',
+              avatarUrl: rev.userAvatar || null // Беремо аватарку з бази
+            }));
             setReviews(mappedReviews);
           }
         }
       } catch (e) {
-        console.error("Помилка завантаження:", e);
+        console.error("Помилка завантаження даних:", e);
       } finally {
         setIsLoading(false);
       }
     };
-
     if (restaurantId) fetchAllData();
-  }, [restaurantId, API_URL, userName, userAvatar]);
+  }, [restaurantId, API_URL]);
+
+  const getValidImageUrl = (url: string | undefined | null) => {
+    if (!url) return null;
+    // Дозволяємо і локальні шляхи Маші (/images/...), і повні посилання (http...)
+    if (url.startsWith('/') || url.startsWith('http')) return url;
+    return null;
+  };
 
   const currentRating = useMemo(() => {
     if (reviews.length === 0) return restaurant?.rating || 0;
@@ -90,7 +91,7 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
     const reviewToSend = {
       rating: rating,
       comment: text,
-      userId: 1, 
+      userId: 1, // Тут Майя має налаштувати отримання реального ID
       restaurantId: parseInt(restaurantId),
       createdAt: new Date().toISOString()
     };
@@ -103,6 +104,7 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
       });
 
       if (res.ok) {
+        // Локальне оновлення для миттєвого фідбеку
         const newReview: ExtendedReview = {
           id: Date.now().toString(),
           visitorName: userName || "Я",
@@ -117,12 +119,6 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
     } catch (e) {
       console.error(e);
     }
-  };
-
-  const getValidImageUrl = (url: string | undefined | null) => {
-    if (!url) return null;
-    if (!url.startsWith('http') && !url.startsWith('/')) return null;
-    return url;
   };
 
   if (isLoading) return <div className="text-center py-20 text-[#B8B0A0]">Завантаження смаколиків...</div>;
@@ -165,7 +161,7 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
         </div>
 
         <div className="flex gap-3 mb-12">
-          {restaurant.categories?.map((cat: any) => (
+          {(restaurant.categories as any[])?.map((cat: any) => (
             <span key={cat.id} className="px-5 py-2 bg-[#1A1A1A] text-[#EDE8D0] rounded-full border border-[#333333] font-medium text-sm uppercase tracking-wider">
               {cat.name}
             </span>
