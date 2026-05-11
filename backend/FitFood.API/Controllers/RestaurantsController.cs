@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FitFood.API.Data;
+using FitFood.API.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FitFood.API.Data;
 
 namespace FitFood.API.Controllers
 {
@@ -20,6 +21,15 @@ namespace FitFood.API.Controllers
         {
             var restaurants = await _context.Restaurants.ToListAsync();
             return Ok(restaurants);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Restaurant>> PostRestaurant(Restaurant restaurant)
+        {
+            _context.Restaurants.Add(restaurant);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetRestaurant", new { id = restaurant.Id }, restaurant);
         }
     }
 }
