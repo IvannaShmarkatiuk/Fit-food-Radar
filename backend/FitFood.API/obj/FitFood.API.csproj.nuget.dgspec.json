@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Майя\\Fit-food-Radar\\Fit-food-Radar\\backend\\FitFood.API\\FitFood.API.csproj": {}
+    "/Users/ivankasmarkatiuk/VScodePrograms/FIT_foodradar/backend/FitFood.API/FitFood.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Майя\\Fit-food-Radar\\Fit-food-Radar\\backend\\FitFood.API\\FitFood.API.csproj": {
+    "/Users/ivankasmarkatiuk/VScodePrograms/FIT_foodradar/backend/FitFood.API/FitFood.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Майя\\Fit-food-Radar\\Fit-food-Radar\\backend\\FitFood.API\\FitFood.API.csproj",
+        "projectUniqueName": "/Users/ivankasmarkatiuk/VScodePrograms/FIT_foodradar/backend/FitFood.API/FitFood.API.csproj",
         "projectName": "FitFood.API",
-        "projectPath": "C:\\Users\\Майя\\Fit-food-Radar\\Fit-food-Radar\\backend\\FitFood.API\\FitFood.API.csproj",
-        "packagesPath": "C:\\Users\\Майя\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Майя\\Fit-food-Radar\\Fit-food-Radar\\backend\\FitFood.API\\obj\\",
+        "projectPath": "/Users/ivankasmarkatiuk/VScodePrograms/FIT_foodradar/backend/FitFood.API/FitFood.API.csproj",
+        "packagesPath": "/Users/ivankasmarkatiuk/.nuget/packages/",
+        "outputPath": "/Users/ivankasmarkatiuk/VScodePrograms/FIT_foodradar/backend/FitFood.API/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Майя\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/ivankasmarkatiuk/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -80,6 +74,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.24, 8.0.24]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.osx-arm64",
+              "version": "[8.0.24, 8.0.24]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.24, 8.0.24]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -88,7 +96,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
