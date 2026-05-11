@@ -3,78 +3,98 @@ import { Header } from './components/Header';
 import { CatalogPage } from './pages/CatalogPage';
 import { RestaurantDetailPage } from './pages/RestaurantDetailPage';
 import { LoginModal, UserData } from './components/LoginModal';
-import { EditProfileModal } from './components/EditProfileModal';
 import { Restaurant } from './types';
 
 export function App() {
-  const API_URL = import.meta.env.VITE_API_URL || 'http://fitfood.runasp.net';
-
-  const [currentPage, setCurrentPage] = useState<'catalog' | 'detail' | 'favorites'>('catalog');
+  const API_URL = 'http://fitfood.runasp.net';
+  const [currentPage, setCurrentPage] = useState<'catalog' | 'detail'>('catalog');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [userName, setUserName] = useState('');
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
-  const [favorites, setFavorites] = useState<string[]>([]); 
+  
+  // 1. ДОДАЄМО СТАН ДЛЯ ПОШУКУ (Header його вимагає)
   const [searchQuery, setSearchQuery] = useState('');
+  
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
     fetch(`${API_URL}/api/Restaurants`)
       .then(res => res.json())
-      .then(data => { setRestaurants(data); setIsLoading(false); })
-      .catch(err => { console.error(err); setIsLoading(false); });
-  }, [API_URL]);
-
-  const toggleFavorite = async (id: string) => {
-    if (!isLoggedIn) { setShowLoginModal(true); return; }
-    const isFav = favorites.includes(id);
-    try {
-      if (isFav) {
-        await fetch(`${API_URL}/api/Favorites/1/${id}`, { method: 'DELETE' });
-        setFavorites(prev => prev.filter(fId => fId !== id));
-      } else {
-        const res = await fetch(`${API_URL}/api/Favorites`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: 1, restaurantId: parseInt(id) })
-        });
-        if (res.ok) setFavorites(prev => [...prev, id]);
-      }
-    } catch (e) { console.error(e); }
-  };
+      .then(data => { 
+        setRestaurants(data); 
+        setIsLoading(false); 
+      });
+    
+    const savedId = localStorage.getItem('user_id');
+    const savedName = localStorage.getItem('user_name');
+    if (savedId && savedName) {
+      setCurrentUserId(Number(savedId));
+      setUserName(savedName);
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const handleLogin = (data: UserData) => {
-    setUserName(data.name); setUserAvatar(data.avatarUrl); setIsLoggedIn(true); setShowLoginModal(false);
+    setCurrentUserId(data.id);
+    setUserName(data.name);
+    setUserAvatar(data.avatarUrl);
+    setIsLoggedIn(true);
+    setShowLoginModal(false);
+    localStorage.setItem('user_id', data.id.toString());
+    localStorage.setItem('user_name', data.name);
+  };
+
+  // 2. ДОДАЄМО ФУНКЦІЮ ВИХОДУ
+  const handleLogout = () => {
+    setCurrentUserId(null);
+    setUserName('');
+    setUserAvatar(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('user_name');
   };
 
   return (
     <div className="min-h-screen bg-[#121212] text-[#B8B0A0]">
+      {/* 3. ПЕРЕДАЄМО ВСІ ПРОПСИ, ВКЛЮЧАЮЧИ ПОШУК ТА ВИХІД */}
       <Header 
         onLoginClick={() => setShowLoginModal(true)} 
-        onLogoClick={() => {setCurrentPage('catalog'); setSelectedRestaurantId(null);}} 
-        isLoggedIn={isLoggedIn} userName={userName} userAvatar={userAvatar} 
-        onLogout={() => setIsLoggedIn(false)} 
-        onFavoritesClick={() => setCurrentPage('favorites')}
-        searchQuery={searchQuery} onSearchChange={setSearchQuery}
-        onEditProfileClick={() => setShowEditModal(true)}
+        onLogoClick={() => setCurrentPage('catalog')} 
+        isLoggedIn={isLoggedIn} 
+        userName={userName} 
+        userAvatar={userAvatar}
+        searchQuery={searchQuery}       // Додано
+        onSearchChange={setSearchQuery} // Додано
+        onLogout={handleLogout}         // Додано
+        onFavoritesClick={() => {}}     // Додано
+        onEditProfileClick={() => {}}   // Додано
       />
-      {currentPage === 'catalog' && (
-        <CatalogPage onRestaurantClick={(id) => {setSelectedRestaurantId(id); setCurrentPage('detail');}} 
-          favorites={favorites} toggleFavorite={toggleFavorite} searchQuery={searchQuery}
-          restaurants={restaurants} isLoading={isLoading} />
+      
+      {currentPage === 'catalog' ? (
+        <CatalogPage 
+          onRestaurantClick={(id) => { setSelectedRestaurantId(id); setCurrentPage('detail'); }} 
+          restaurants={restaurants} 
+          isLoading={isLoading} 
+          favorites={[]} 
+          toggleFavorite={() => {}} 
+          searchQuery={searchQuery} // Тепер пошук буде працювати реально
+        />
+      ) : (
+        <RestaurantDetailPage 
+          restaurantId={selectedRestaurantId} 
+          onBack={() => setCurrentPage('catalog')} 
+          userName={userName} 
+          userAvatar={userAvatar} 
+          isLoggedIn={isLoggedIn}
+          userId={currentUserId}
+        />
       )}
-      {currentPage === 'detail' && selectedRestaurantId && (
-        <RestaurantDetailPage restaurantId={selectedRestaurantId} onBack={() => setCurrentPage('catalog')} 
-          userName={userName} userAvatar={userAvatar} isLoggedIn={isLoggedIn} />
-      )}
+      
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} onLogin={handleLogin} />
-      <EditProfileModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} 
-        onSave={(d) => {setUserName(d.name); setUserAvatar(d.avatarUrl); setShowEditModal(false);}} 
-        currentName={userName} currentAvatar={userAvatar} />
     </div>
   );
 }

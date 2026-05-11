@@ -1,17 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { XIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 
 export interface UserData {
+  id: number;
   name: string;
   avatarUrl: string | null;
 }
-
-const PRESET_AVATARS = [
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Mimi',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver'
-];
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -20,43 +14,43 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
+  const API_URL = 'http://fitfood.runasp.net';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(PRESET_AVATARS[0]);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>('https://api.dicebear.com/7.x/avataaars/svg?seed=Felix');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      const savedName = localStorage.getItem('user_name_cache');
-      if (savedName) setName(savedName);
-    }
-  }, [isOpen]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch(`${API_URL}/api/Users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      if (res.ok) {
+        const savedUser = await res.json();
+        onLogin({ id: savedUser.id, name: savedUser.name, avatarUrl });
+      } else {
+        alert("Помилка реєстрації. Можливо, пошта вже зайнята?");
+      }
+    } catch (e) { console.error(e); }
+    finally { setIsSubmitting(false); }
+  };
 
   if (!isOpen) return null;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.trim() && email.trim() && password.trim()) {
-      localStorage.setItem('user_name_cache', name);
-      onLogin({ name, avatarUrl });
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-[#1A1A1A] w-full max-w-md rounded-2xl border border-[#333333] p-8 relative shadow-2xl">
-        <button onClick={onClose} className="absolute top-4 right-4 text-[#8A8278] hover:text-[#EDE8D0]">
-          <XIcon size={20} />
-        </button>
-        <h2 className="text-2xl font-bold text-[#EDE8D0] mb-6 text-center uppercase tracking-widest">Вхід</h2>
+        <button onClick={onClose} className="absolute top-4 right-4 text-[#8A8278] hover:text-[#EDE8D0]"><XIcon size={20} /></button>
+        <h2 className="text-2xl font-bold text-[#EDE8D0] mb-6 text-center uppercase tracking-widest">Реєстрація</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex justify-center gap-3 mb-6">
-            {PRESET_AVATARS.map(url => (
-              <img key={url} src={url} alt="av" onClick={() => setAvatarUrl(url)} 
-                className={`w-12 h-12 rounded-full cursor-pointer border-2 transition-all ${avatarUrl === url ? 'border-[#C45A2A] scale-110' : 'border-transparent opacity-50'}`} />
-            ))}
-          </div>
           <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Ім'я" className="w-full p-3 bg-[#121212] border border-[#333333] rounded-lg text-white" required />
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" className="w-full p-3 bg-[#121212] border border-[#333333] rounded-lg text-white" required />
           <div className="relative">
@@ -65,7 +59,9 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
               {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
             </button>
           </div>
-          <button type="submit" className="w-full py-3 bg-[#2E7D32] text-white font-bold rounded-lg hover:bg-[#236026] transition-all">Увійти</button>
+          <button type="submit" disabled={isSubmitting} className="w-full py-3 bg-[#2E7D32] text-white font-bold rounded-lg hover:bg-[#236026] disabled:opacity-50">
+            {isSubmitting ? "Створення..." : "Зареєструватися"}
+          </button>
         </form>
       </div>
     </div>

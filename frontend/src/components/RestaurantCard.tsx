@@ -15,24 +15,16 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
   const address = restaurant.address || (restaurant as any).Address;
   const rawImg = restaurant.imageUrl || (restaurant as any).ImageUrl;
   
-  const defaultImg = "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80";
-  
-  // Логіка витягування фото прямо з папки public
-  let finalImg = defaultImg;
-  if (rawImg) {
-    if (rawImg.startsWith('http')) finalImg = rawImg;
-    else {
-      const fileName = rawImg.split('/').pop(); 
-      finalImg = `/${fileName}`; 
-    }
-  }
+  const getImg = (url: string) => {
+    if (!url) return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800";
+    const fileName = url.split('/').pop();
+    return `/${fileName}`; 
+  };
 
   return (
     <div onClick={onClick} className="bg-[#1A1A1A] border border-[#333333] rounded-2xl overflow-hidden cursor-pointer group hover:border-[#4A4A4A] transition-all flex flex-col relative shadow-lg">
-      {/* Збільшено h-[200px] -> h-[240px] */}
       <div className="h-[240px] w-full relative overflow-hidden bg-[#1A1A1A]">
-        <img src={finalImg} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-          onError={(e) => { (e.target as HTMLImageElement).src = defaultImg; }} />
+        <img src={getImg(rawImg)} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
       </div>
       <button onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(e); }} className="absolute top-3 right-3 p-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 z-10 transition-transform active:scale-90">
         <HeartIcon className={`w-4 h-4 ${isFavorite ? 'fill-[#ef4444] text-[#ef4444]' : 'text-white'}`} />
@@ -50,9 +42,7 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
         </div>
         <div className="flex flex-wrap gap-1 mt-auto">
           {((restaurant as any).categories || (restaurant as any).Categories || [])?.map((cat: string) => (
-            <span key={cat} className="text-[10px] uppercase font-bold text-[#C45A2A] bg-[#C45A2A]/10 px-2 py-0.5 rounded border border-[#C45A2A]/20">
-              {cat}
-            </span>
+            <span key={cat} className="text-[10px] uppercase font-bold text-[#C45A2A] bg-[#C45A2A]/10 px-2 py-0.5 rounded border border-[#C45A2A]/20">{cat}</span>
           ))}
         </div>
       </div>
