@@ -31,7 +31,7 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
             })));
           }
         }
-      } catch (e) { console.error(e); }
+      } catch (e) { console.error("Помилка:", e); }
       finally { setIsLoading(false); }
     };
     fetchData();
@@ -39,17 +39,16 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
 
   const handleAddReview = async (text: string, rating: number) => {
     if (!userId) { alert("Будь ласка, увійдіть!"); return; }
-
-    // ВИПРАВЛЕНО: Використовуємо PascalCase (з великої літери), 
-    // як того зазвичай хоче .NET, і додаємо null для Restaurant
+    
+    // Включаємо User та Restaurant як null для обходу помилки валідації 400 [cite: 1]
     const body = {
-      Rating: rating,
-      Comment: text,
-      UserId: userId,
-      RestaurantId: Number(restaurantId),
-      CreatedAt: new Date().toISOString(),
-      User: null,       // Щоб обійти обов'язкове поле на сервері
-      Restaurant: null  // Щоб обійти обов'язкове поле на сервері
+      rating,
+      comment: text,
+      userId,
+      restaurantId: Number(restaurantId),
+      createdAt: new Date().toISOString(),
+      user: null,
+      restaurant: null
     };
 
     try {
@@ -58,12 +57,10 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-
-      if (res.ok) {
-        window.location.reload();
-      } else {
-        const errorText = await res.text();
-        alert(`Помилка сервера (Майя, глянь!): ${errorText}`);
+      if (res.ok) window.location.reload();
+      else {
+        const err = await res.text();
+        alert(`Помилка сервера: ${err}`);
       }
     } catch (e) { console.error(e); }
   };
@@ -71,6 +68,7 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
   const getImg = (url: string) => {
     if (!url) return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200";
     let fileName = url.split('/').pop() || "";
+    // Виправлення помилок у назвах файлів
     fileName = fileName.replace('jng', 'jpg').replace('mcdonalds', 'macdonalds').replace('menyamusashi', 'menyanusashi');
     return `/${fileName}`; 
   };
@@ -82,32 +80,21 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
       <div className="w-full h-[500px] relative bg-[#1A1A1A]">
         <img src={getImg(restaurant.imageUrl || restaurant.ImageUrl)} alt="hero" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#121212] opacity-80" />
-        <button onClick={onBack} className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-black/40 rounded-lg text-white z-20 backdrop-blur-md border border-white/10 hover:bg-black/60 transition-all">
+        <button onClick={onBack} className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-black/40 rounded-lg text-white z-20 backdrop-blur-md border border-white/10">
           <ArrowLeftIcon size={16} /> Назад
         </button>
       </div>
-
       <div className="px-8 -mt-16 relative z-10">
-        <div className="flex items-center gap-6 mb-12">
-          <h1 className="text-6xl font-bold text-white tracking-tight">{restaurant.name || restaurant.Name}</h1>
-          <div className="bg-[#1A1A1A] border border-[#333333] px-4 py-2 rounded-xl flex items-center gap-2 shadow-2xl">
-             <StarIcon size={20} className="text-[#C45A2A] fill-[#C45A2A]" />
-             <span className="text-white font-bold text-xl">
-               {(reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length || 1)).toFixed(1)}
-             </span>
-          </div>
-        </div>
-        <p className="flex items-center gap-2 text-[#B8B0A0] text-xl mb-12 italic">
+        <h1 className="text-6xl font-bold text-white mb-4">{restaurant.name || restaurant.Name}</h1>
+        <p className="flex items-center gap-2 text-[#B8B0A0] text-xl mb-12">
           <MapPinIcon className="text-[#C45A2A]" size={20} /> {restaurant.address || restaurant.Address}
         </p>
-
         <div className="mb-16">
           <h3 className="text-[#EDE8D0] font-bold mb-6 uppercase text-xs opacity-50 tracking-widest">Локація на карті</h3>
-          <div className="w-full h-[450px] rounded-3xl overflow-hidden border border-[#333333] bg-[#000] shadow-2xl flex items-center justify-center">
+          <div className="w-full h-[450px] rounded-3xl overflow-hidden border border-[#333333] bg-[#000] flex items-center justify-center">
             <img src={getImg(restaurant.mapImageUrl || restaurant.MapImageUrl)} className="max-w-full max-h-full object-contain" alt="map" />
           </div>
         </div>
-
         <ReviewSection reviews={reviews} onAddReview={handleAddReview} isLoggedIn={isLoggedIn} />
       </div>
     </motion.main>

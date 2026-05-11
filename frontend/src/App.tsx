@@ -6,7 +6,7 @@ import { LoginModal, UserData } from './components/LoginModal';
 import { Restaurant } from './types';
 
 export function App() {
-  const API_URL = 'http://fitfood.runasp.net';
+  const API_URL = 'http://fitfood.runasp.net'; // URL Майї
   const [currentPage, setCurrentPage] = useState<'catalog' | 'detail'>('catalog');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -14,20 +14,15 @@ export function App() {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [userName, setUserName] = useState('');
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
-  
-  // 1. ДОДАЄМО СТАН ДЛЯ ПОШУКУ (Header його вимагає)
   const [searchQuery, setSearchQuery] = useState('');
-  
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetch(`${API_URL}/api/Restaurants`)
       .then(res => res.json())
-      .then(data => { 
-        setRestaurants(data); 
-        setIsLoading(false); 
-      });
+      .then(data => { setRestaurants(data); setIsLoading(false); })
+      .catch(err => console.error("Помилка завантаження ресторанів:", err));
     
     const savedId = localStorage.getItem('user_id');
     const savedName = localStorage.getItem('user_name');
@@ -48,30 +43,26 @@ export function App() {
     localStorage.setItem('user_name', data.name);
   };
 
-  // 2. ДОДАЄМО ФУНКЦІЮ ВИХОДУ
   const handleLogout = () => {
-    setCurrentUserId(null);
-    setUserName('');
-    setUserAvatar(null);
     setIsLoggedIn(false);
+    setCurrentUserId(null);
     localStorage.removeItem('user_id');
     localStorage.removeItem('user_name');
   };
 
   return (
     <div className="min-h-screen bg-[#121212] text-[#B8B0A0]">
-      {/* 3. ПЕРЕДАЄМО ВСІ ПРОПСИ, ВКЛЮЧАЮЧИ ПОШУК ТА ВИХІД */}
       <Header 
         onLoginClick={() => setShowLoginModal(true)} 
         onLogoClick={() => setCurrentPage('catalog')} 
         isLoggedIn={isLoggedIn} 
         userName={userName} 
         userAvatar={userAvatar}
-        searchQuery={searchQuery}       // Додано
-        onSearchChange={setSearchQuery} // Додано
-        onLogout={handleLogout}         // Додано
-        onFavoritesClick={() => {}}     // Додано
-        onEditProfileClick={() => {}}   // Додано
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onLogout={handleLogout}
+        onFavoritesClick={() => {}} // Можна додати пізніше
+        onEditProfileClick={() => {}}
       />
       
       {currentPage === 'catalog' ? (
@@ -81,7 +72,7 @@ export function App() {
           isLoading={isLoading} 
           favorites={[]} 
           toggleFavorite={() => {}} 
-          searchQuery={searchQuery} // Тепер пошук буде працювати реально
+          searchQuery={searchQuery} 
         />
       ) : (
         <RestaurantDetailPage 
