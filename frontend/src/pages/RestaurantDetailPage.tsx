@@ -4,7 +4,7 @@ import { ArrowLeftIcon, MapPinIcon, StarIcon } from 'lucide-react';
 import { ReviewSection } from '../components/ReviewSection';
 
 export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvatar, isLoggedIn, userId }: any) {
-  const API_URL = 'http://fitfood.runasp.net';
+  const API_URL = 'https://fitfood-api.onrender.com';
   const [restaurant, setRestaurant] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);

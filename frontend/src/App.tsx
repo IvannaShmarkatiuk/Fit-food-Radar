@@ -6,7 +6,7 @@ import { LoginModal, UserData } from './components/LoginModal';
 import { Restaurant } from './types';
 
 export function App() {
-  const API_URL = 'http://fitfood.runasp.net'; // URL Майї
+  const API_URL = 'https://fitfood-api.onrender.com'; 
   const [currentPage, setCurrentPage] = useState<'catalog' | 'detail'>('catalog');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
