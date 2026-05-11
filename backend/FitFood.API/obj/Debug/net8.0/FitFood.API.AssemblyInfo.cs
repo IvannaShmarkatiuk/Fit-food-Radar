@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FitFood.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+77b8bed53228413365e5d9150a298050f0179d75")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2f8e8e1f48005711f7cdfc204290922d7f110dd1")]
 [assembly: System.Reflection.AssemblyProductAttribute("FitFood.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FitFood.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
