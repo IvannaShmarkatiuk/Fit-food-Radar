@@ -30,7 +30,7 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
     setIsSubmitting(true);
 
     try {
-      // Визначаємо шлях: якщо вхід — шукаємо юзера, якщо реєстрація — створюємо
+      
       const endpoint = isLoginMode ? `${API_URL}/api/Users/login` : `${API_URL}/api/Users`;
       
       const res = await fetch(endpoint, {
