@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FitFood.API.Data;
-
+using FitFood.API.Data; 
+using FitFood.API.Models;
 namespace FitFood.API.Controllers
 {
     [Route("api/[controller]")]
@@ -20,6 +20,25 @@ namespace FitFood.API.Controllers
         {
             var restaurants = await _context.Restaurants.ToListAsync();
             return Ok(restaurants);
+        }
+
+    
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Restaurant>> GetRestaurant(int id)
+        {
+            var restaurant = await _context.Restaurants.FindAsync(id);
+            if (restaurant == null) return NotFound();
+            return restaurant;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Restaurant>> PostRestaurant(Restaurant restaurant)
+        {
+            _context.Restaurants.Add(restaurant);
+            await _context.SaveChangesAsync();
+
+            // Тепер GetRestaurant (в однині) існує, і помилки не буде
+            return CreatedAtAction(nameof(GetRestaurant), new { id = restaurant.Id }, restaurant);
         }
     }
 }
