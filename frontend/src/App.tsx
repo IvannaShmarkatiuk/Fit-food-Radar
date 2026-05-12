@@ -68,7 +68,7 @@ export function App() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onLogout={handleLogout}
-        onFavoritesClick={() => {}} // Можна додати пізніше
+        onFavoritesClick={() => {}} 
         onEditProfileClick={() => {}}
       />
       
@@ -78,7 +78,7 @@ export function App() {
           restaurants={restaurants} 
           isLoading={isLoading} 
           favorites={[]} 
-          toggleFavorite={() => {}} 
+          toggleFavorite={handleToggleFavorite} 
           searchQuery={searchQuery} 
         />
       ) : (
