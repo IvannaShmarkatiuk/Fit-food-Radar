@@ -15,8 +15,7 @@ interface LoginModalProps {
 
 export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
   const API_URL = 'https://fitfood-api.onrender.com';
-  
-  // Режим: 'login' (Вхід) або 'register' (Реєстрація)
+
   const [isLoginMode, setIsLoginMode] = useState(true);
   
   const [name, setName] = useState('');
@@ -62,12 +61,12 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
       <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333333] p-8 relative shadow-2xl">
-        <button onClick={onClose} className="absolute top-6 right-6 text-[#8A8278] hover:text-white transition-colors">
+        <button onClick={onClose} className="absolute top-4 right-4 p-2 z-10 text-[#8A8278] hover:text-white transition-colors hover:bg-white/5 rounded-full">
           <XIcon size={24} />
         </button>
 
         {}
-        <div className="flex bg-[#121212] p-1 rounded-2xl mb-8 border border-[#333333]">
+        <div className="flex bg-[#121212] p-1 rounded-2xl mb-8 mt-6 border border-[#333333]">
           <button 
             onClick={() => setIsLoginMode(true)}
             className={`flex-1 py-2 rounded-xl font-bold transition-all ${isLoginMode ? 'bg-[#C45A2A] text-white shadow-lg' : 'text-[#8A8278]'}`}

@@ -49,6 +49,13 @@ export function App() {
     localStorage.removeItem('user_id');
     localStorage.removeItem('user_name');
   };
+  const handleToggleFavorite = (restaurantId: string | number) => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true); 
+      return;
+    }
+    console.log("Додаємо в улюблене заклад ID:", restaurantId);
+  };
 
   return (
     <div className="min-h-screen bg-[#121212] text-[#B8B0A0]">
@@ -61,7 +68,7 @@ export function App() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onLogout={handleLogout}
-        onFavoritesClick={() => {}} // Можна додати пізніше
+        onFavoritesClick={() => {}} 
         onEditProfileClick={() => {}}
       />
       
@@ -71,7 +78,7 @@ export function App() {
           restaurants={restaurants} 
           isLoading={isLoading} 
           favorites={[]} 
-          toggleFavorite={() => {}} 
+          toggleFavorite={handleToggleFavorite} 
           searchQuery={searchQuery} 
         />
       ) : (
@@ -82,6 +89,9 @@ export function App() {
           userAvatar={userAvatar} 
           isLoggedIn={isLoggedIn}
           userId={currentUserId}
+        
+          favorites={[]} 
+          onToggleFavorite={handleToggleFavorite} 
         />
       )}
       
