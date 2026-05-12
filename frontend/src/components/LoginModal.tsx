@@ -48,10 +48,10 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
         });
       } else {
         const errorText = await res.text();
-        alert(isLoginMode ? "Невірний email або пароль" : `Помилка: ${errorText || "Пошта вже зайнята"}`);
+        alert(isLoginMode ? "Неправильний email або пароль" : `Помилка: ${errorText || "Пошта вже зайнята"}`);
       }
     } catch (e) {
-      alert("Сервер Майї не відповідає. Перевір налаштування Mixed Content!");
+      alert("Сервер не відповідає. Перевір налаштування Mixed Content!");
     } finally {
       setIsSubmitting(false);
     }
@@ -66,7 +66,7 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
           <XIcon size={24} />
         </button>
 
-        {/* Перемикач режимів */}
+        {}
         <div className="flex bg-[#121212] p-1 rounded-2xl mb-8 border border-[#333333]">
           <button 
             onClick={() => setIsLoginMode(true)}
@@ -83,7 +83,7 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
         </div>
 
         <h2 className="text-3xl font-black text-[#EDE8D0] mb-8 text-center uppercase tracking-tighter">
-          {isLoginMode ? 'З поверненням!' : 'Створити профіль'}
+          {isLoginMode ? 'З поверненням!💕' : 'Створити профіль 👀'}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -136,7 +136,7 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
         </form>
 
         <p className="mt-8 text-center text-[#8A8278] text-sm font-medium">
-          {isLoginMode ? 'Вперше тут?' : 'Вже маєте акаунт?'} 
+          {isLoginMode ? 'Вперше тут?🤗' : 'Вже маєте акаунт?🫶🏻'} 
           <button 
             onClick={() => setIsLoginMode(!isLoginMode)}
             className="ml-2 text-[#C45A2A] font-bold hover:underline"

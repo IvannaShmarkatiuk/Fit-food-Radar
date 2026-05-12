@@ -40,7 +40,6 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
   const handleAddReview = async (text: string, rating: number) => {
     if (!userId) { alert("Будь ласка, увійдіть!"); return; }
     
-    // Включаємо User та Restaurant як null для обходу помилки валідації 400 [cite: 1]
     const body = {
       rating,
       comment: text,
@@ -68,7 +67,7 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
   const getImg = (url: string) => {
     if (!url) return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200";
     let fileName = url.split('/').pop() || "";
-    // Виправлення помилок у назвах файлів
+
     fileName = fileName.replace('jng', 'jpg').replace('mcdonalds', 'macdonalds').replace('menyamusashi', 'menyanusashi');
     return `/${fileName}`; 
   };
@@ -85,7 +84,19 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
         </button>
       </div>
       <div className="px-8 -mt-16 relative z-10">
-        <h1 className="text-6xl font-bold text-white mb-4">{restaurant.name || restaurant.Name}</h1>
+        <div className="flex items-center gap-6 mb-8">
+  <h1 className="text-6xl font-bold text-white tracking-tight">
+    {restaurant.name || restaurant.Name}
+          </h1>
+          
+          {}
+          <div className="bg-[#1A1A1A] border border-[#333333] px-4 py-2 rounded-xl flex items-center gap-2 shadow-2xl">
+            <StarIcon size={20} className="text-[#C45A2A] fill-[#C45A2A]" />
+            <span className="text-white font-bold text-xl">
+              {restaurant.rating || (restaurant as any).Rating || "0.0"}
+            </span>
+          </div>
+        </div>
         <p className="flex items-center gap-2 text-[#B8B0A0] text-xl mb-12">
           <MapPinIcon className="text-[#C45A2A]" size={20} /> {restaurant.address || restaurant.Address}
         </p>
