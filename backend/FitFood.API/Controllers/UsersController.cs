@@ -49,5 +49,25 @@ namespace FitFood.API.Controllers
 
             return Ok(user);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, User user)
+        {
+            if (id != user.Id) return BadRequest();
+
+            _context.Entry(user).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Users.Any(u => u.Id == id)) return NotFound();
+                else throw;
+            }
+
+            return NoContent();
+        }
     }
 }

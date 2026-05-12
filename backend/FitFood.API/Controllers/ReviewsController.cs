@@ -26,10 +26,15 @@ namespace FitFood.API.Controllers
             return Ok(reviews);
         }
 
+        
         [HttpPost]
         public async Task<IActionResult> PostReview(Review review)
         {
-            review.CreatedAt = DateTime.Now; 
+        
+            review.CreatedAt = DateTime.UtcNow;
+
+            review.User = null;
+            review.Restaurant = null;
 
             _context.Reviews.Add(review);
             await _context.SaveChangesAsync();
@@ -38,7 +43,6 @@ namespace FitFood.API.Controllers
 
             return Ok(review);
         }
-
         private async Task UpdateRestaurantRating(int restaurantId)
         {
             var restaurant = await _context.Restaurants
