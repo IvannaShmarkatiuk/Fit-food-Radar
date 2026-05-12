@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { StarIcon } from 'lucide-react';
-import { ExtendedReview } from '../pages/RestaurantDetailPage';
-
+export interface ExtendedReview {
+  id: string;
+  visitorName: string;
+  date: string;
+  text: string;
+  rating: number;
+  avatarUrl?: string | null;
+  avatarColor?: string;
+}
 interface ReviewSectionProps {
   reviews: ExtendedReview[];
   onAddReview: (text: string, rating: number) => void;
