@@ -14,11 +14,10 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
   const rating = restaurant.rating || (restaurant as any).Rating;
   const address = restaurant.address || (restaurant as any).Address;
   const rawImg = restaurant.imageUrl || (restaurant as any).ImageUrl;
-  
+
   const getImg = (url: string) => {
     if (!url) return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800";
-    const fileName = url.split('/').pop();
-    return `/${fileName}`; 
+    return url;
   };
 
   return (
