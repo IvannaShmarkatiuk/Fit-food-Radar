@@ -36,8 +36,7 @@ namespace FitFood.API.Controllers
         {
             _context.Restaurants.Add(restaurant);
             await _context.SaveChangesAsync();
-
-            // Тепер GetRestaurant (в однині) існує, і помилки не буде
+            
             return CreatedAtAction(nameof(GetRestaurant), new { id = restaurant.Id }, restaurant);
         }
     }

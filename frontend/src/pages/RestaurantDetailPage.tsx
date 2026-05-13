@@ -16,11 +16,11 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
         const revData = await revRes.json();
         setReviews(revData.map((rev: any) => ({
           id: rev.id.toString(),
-          visitorName: rev.userId === userId ? userName : (rev.userName || "Гість"),
+          visitorName: rev.userId === userId ? userName : (rev.user?.name || "Гість"),
           date: new Date(rev.createdAt || rev.CreatedAt).toLocaleDateString('uk-UA'),
           text: rev.comment || rev.Comment,
           rating: rev.rating || rev.Rating,
-          avatarUrl: rev.userId === userId ? userAvatar : null
+          avatarUrl: rev.userId === userId ? userAvatar : (rev.user?.avatarUrl || null)
         })));
       }
     } catch (e) {
@@ -81,8 +81,10 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
   const getImg = (url: string) => {
     if (!url) return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200";
     let fileName = url.split('/').pop() || "";
-    fileName = fileName.replace('jng', 'jpg').replace('mcdonalds', 'macdonalds').replace('menyamusashi', 'menyanusashi');
-    return `/${fileName}`;
+    fileName = fileName.replace('.jng', '.jpg');
+    fileName = fileName.replace('map_mcdonalds', 'map_macdonalds');
+    fileName = fileName.replace('map_menyamusashi', 'map_menyanusashi');
+    return "/" + fileName;
   };
 
   const isFavorite = favorites?.includes(restaurantId?.toString());
