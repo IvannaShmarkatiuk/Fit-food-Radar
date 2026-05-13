@@ -51,23 +51,28 @@ namespace FitFood.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, User user)
+        public async Task<IActionResult> UpdateUser(int id, User updatedUser)
         {
-            if (id != user.Id) return BadRequest();
+            if (id != updatedUser.Id) return BadRequest();
 
-            _context.Entry(user).State = EntityState.Modified;
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Users.Any(u => u.Id == id)) return NotFound();
-                else throw;
-            }
+            // Оновлюємо тільки ті поля, які прийшли
+            if (!string.IsNullOrEmpty(updatedUser.Name))
+                user.Name = updatedUser.Name;
 
-            return NoContent();
+            if (!string.IsNullOrEmpty(updatedUser.Email))
+                user.Email = updatedUser.Email;
+
+            if (!string.IsNullOrEmpty(updatedUser.Password))
+                user.Password = updatedUser.Password;
+
+            if (updatedUser.AvatarUrl != null)
+                user.AvatarUrl = updatedUser.AvatarUrl;
+
+            await _context.SaveChangesAsync();
+            return Ok(user); // повертаємо оновленого юзера замість NoContent
         }
     }
 }
