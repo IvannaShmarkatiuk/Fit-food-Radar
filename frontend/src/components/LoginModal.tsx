@@ -30,7 +30,7 @@ export function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps) {
 
     try {
       
-      const endpoint = isLoginMode ? `${API_URL}/api/Users/register` : `${API_URL}/api/Users`;
+      const endpoint = isLoginMode ? `${API_URL}/api/Users/login` : `${API_URL}/api/Users/register`;
       
       const res = await fetch(endpoint, {
         method: 'POST',
