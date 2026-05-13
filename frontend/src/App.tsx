@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { CatalogPage } from './pages/CatalogPage';
 import { RestaurantDetailPage } from './pages/RestaurantDetailPage';
+import { FavoritesPage } from './pages/FavoritesPage';
 import { LoginModal, UserData } from './components/LoginModal';
 import { Restaurant } from './types';
 
 export function App() {
   const API_URL = 'https://fitfood-api.onrender.com';
-  const [currentPage, setCurrentPage] = useState<'catalog' | 'detail'>('catalog');
+  const [currentPage, setCurrentPage] = useState<'catalog' | 'detail' | 'favorites'>('catalog');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -18,7 +19,6 @@ export function App() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // БАГ 1 ФІКС: favorites тепер реальний стан, а не []
   const [favorites, setFavorites] = useState<string[]>(() => {
     const saved = localStorage.getItem('favorites');
     return saved ? JSON.parse(saved) : [];
@@ -56,15 +56,15 @@ export function App() {
     setIsLoggedIn(false);
     setCurrentUserId(null);
     setUserAvatar(null);
+    setCurrentPage('catalog');
     localStorage.removeItem('user_id');
     localStorage.removeItem('user_name');
     localStorage.removeItem('user_avatar');
   };
 
-
   const handleToggleFavorite = (restaurantId: string | number) => {
     if (!isLoggedIn) {
-      setShowLoginModal(true); 
+      setShowLoginModal(true);
       return;
     }
     const id = restaurantId.toString();
@@ -75,6 +75,14 @@ export function App() {
       localStorage.setItem('favorites', JSON.stringify(updated));
       return updated;
     });
+  };
+
+  const handleFavoritesClick = () => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+    setCurrentPage('favorites');
   };
 
   return (
@@ -88,20 +96,22 @@ export function App() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onLogout={handleLogout}
-        onFavoritesClick={() => {}}
-        onEditProfileClick={() => {}} 
+        onFavoritesClick={handleFavoritesClick}
+        onEditProfileClick={() => {}}
       />
 
-      {currentPage === 'catalog' ? (
+      {currentPage === 'catalog' && (
         <CatalogPage
           onRestaurantClick={(id) => { setSelectedRestaurantId(id); setCurrentPage('detail'); }}
           restaurants={restaurants}
           isLoading={isLoading}
-          favorites={favorites} 
+          favorites={favorites}
           toggleFavorite={handleToggleFavorite}
           searchQuery={searchQuery}
         />
-      ) : (
+      )}
+
+      {currentPage === 'detail' && (
         <RestaurantDetailPage
           restaurantId={selectedRestaurantId}
           onBack={() => setCurrentPage('catalog')}
@@ -109,8 +119,17 @@ export function App() {
           userAvatar={userAvatar}
           isLoggedIn={isLoggedIn}
           userId={currentUserId}
-          favorites={favorites} 
+          favorites={favorites}
           onToggleFavorite={handleToggleFavorite}
+        />
+      )}
+
+      {currentPage === 'favorites' && (
+        <FavoritesPage
+          onRestaurantClick={(id) => { setSelectedRestaurantId(id); setCurrentPage('detail'); }}
+          restaurants={restaurants}
+          favorites={favorites}
+          toggleFavorite={handleToggleFavorite}
         />
       )}
 
