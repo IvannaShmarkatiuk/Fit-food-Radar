@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using FitFood.API.Data;
 using FitFood.API.Models;
+using BCrypt.Net;
 
 namespace FitFood.API.Controllers
 {
@@ -29,6 +30,8 @@ namespace FitFood.API.Controllers
                 return BadRequest("Користувач з таким email вже існує");
             }
 
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
@@ -42,7 +45,7 @@ namespace FitFood.API.Controllers
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == loginDto.Email && u.Password == loginDto.Password);
 
-            if (user == null)
+            if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
             {
                 return Unauthorized("Невірний email або пароль");
             }
