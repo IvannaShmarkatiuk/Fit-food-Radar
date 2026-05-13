@@ -25,7 +25,7 @@ export function ReviewSection({ reviews, onAddReview, isLoggedIn }: ReviewSectio
     if (newReviewText.trim()) {
       onAddReview(newReviewText, rating);
       setNewReviewText('');
-      setRating(5); // Скидаємо до 5 зірок після публікації
+      setRating(5); 
     }
   };
 

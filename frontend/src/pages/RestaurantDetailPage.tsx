@@ -48,7 +48,6 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
     fetchData();
   }, [restaurantId, fetchReviews]);
 
-  // БАГ 6 ФІКС: прибрали window.location.reload() — тепер просто перезавантажуємо відгуки
   const handleAddReview = async (text: string, rating: number) => {
     if (!userId) { alert("Будь ласка, увійдіть!"); return; }
 
@@ -69,7 +68,6 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
         body: JSON.stringify(body)
       });
       if (res.ok) {
-        // БАГ 6 ФІКС: оновлюємо тільки відгуки, не перевантажуємо сторінку
         await fetchReviews();
       } else {
         const err = await res.text();
@@ -88,7 +86,7 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
     fileName = fileName.replace('map_menyamusashi', 'map_menyanusashi');
     return "/" + fileName;
   };
-  // БАГ 1 ФІКС: favorites — рядки, порівнюємо через toString()
+
   const isFavorite = favorites?.includes(restaurantId?.toString());
 
   if (isLoading || !restaurant) return <div className="text-center py-40 text-white font-medium">Вантажимо...</div>;
@@ -116,7 +114,7 @@ export function RestaurantDetailPage({ restaurantId, onBack, userName, userAvata
             </span>
           </div>
 
-          {/* БАГ 4 ФІКС: onToggleFavorite в App.tsx вже відкриє модалку якщо не залогінений */}
+          {}
           <button
             onClick={() => onToggleFavorite(restaurantId)}
             className="p-3 bg-[#1A1A1A] border border-[#333333] rounded-xl hover:bg-[#252525] transition-all shadow-2xl group"
