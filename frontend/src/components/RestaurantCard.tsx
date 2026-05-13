@@ -17,7 +17,9 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
 
   const getImg = (url: string) => {
     if (!url) return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800";
-    return url;
+    let fileName = url.split('/').pop() || "";
+    fileName = fileName.replace('.jng', '.jpg');
+    return "/" + fileName;
   };
 
   return (
@@ -26,7 +28,7 @@ export function RestaurantCard({ restaurant, onClick, isFavorite, onToggleFavori
         <img src={getImg(rawImg)} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
       </div>
       <button onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(e); }} className="absolute top-3 right-3 p-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 z-10 transition-transform active:scale-90">
-        <HeartIcon className={`w-4 h-4 ${isFavorite ? 'fill-[#ef4444] text-[#ef4444]' : 'text-white'}`} />
+        <HeartIcon className={"w-4 h-4 " + (isFavorite ? 'fill-[#ef4444] text-[#ef4444]' : 'text-white')} />
       </button>
       <div className="p-5 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-2">
