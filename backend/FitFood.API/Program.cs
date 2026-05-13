@@ -18,10 +18,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowVercel",
+    options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.WithOrigins("https://fit-food-radar.vercel.app")
+            policy.AllowAnyOrigin()
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -55,7 +55,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowVercel");
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
