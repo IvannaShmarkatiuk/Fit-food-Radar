@@ -26,19 +26,27 @@ namespace FitFood.API.Controllers
             return Ok(reviews);
         }
 
+
         [HttpPost]
         public async Task<IActionResult> PostReview(Review review)
         {
-            review.CreatedAt = DateTime.Now; 
+            try
+            {
+                
+                review.CreatedAt = DateTime.UtcNow;
 
-            _context.Reviews.Add(review);
-            await _context.SaveChangesAsync();
+                _context.Reviews.Add(review);
+                await _context.SaveChangesAsync();
 
-            await UpdateRestaurantRating(review.RestaurantId);
+                await UpdateRestaurantRating(review.RestaurantId);
 
-            return Ok(review);
+                return Ok(review);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Database Error: {ex.Message}");
+            }
         }
-
         private async Task UpdateRestaurantRating(int restaurantId)
         {
             var restaurant = await _context.Restaurants
