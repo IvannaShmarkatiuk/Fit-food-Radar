@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SearchIcon, UserIcon, LogOutIcon, HeartIcon, ChevronDownIcon, SettingsIcon, SendIcon, LifeBuoyIcon } from 'lucide-react';
+import { SearchIcon, UserIcon, LogOutIcon, HeartIcon, ChevronDownIcon, SendIcon, LifeBuoyIcon } from 'lucide-react';
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -14,7 +14,7 @@ interface HeaderProps {
   onEditProfileClick: () => void;
 }
 
-export function Header({ onLoginClick, onLogoClick, isLoggedIn, userName, userAvatar, onLogout, onFavoritesClick, searchQuery, onSearchChange, onEditProfileClick }: HeaderProps) {
+export function Header({ onLoginClick, onLogoClick, isLoggedIn, userName, userAvatar, onLogout, onFavoritesClick, searchQuery, onSearchChange }: HeaderProps) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   return (
@@ -54,10 +54,8 @@ export function Header({ onLoginClick, onLogoClick, isLoggedIn, userName, userAv
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setIsProfileMenuOpen(false)} />
                 <div className="absolute right-0 top-full mt-2 w-72 bg-[#1A1A1A] border border-[#333333] rounded-xl shadow-2xl py-2 z-50 animate-in fade-in duration-200">
-                  <button onClick={() => { onEditProfileClick(); setIsProfileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-[#EDE8D0] hover:bg-[#252525] transition-colors">
-                    <SettingsIcon className="w-5 h-5 text-[#8A8278]" />
-                    <span className="font-medium">Редагувати профіль</span>
-                  </button>
+
+                  {}
 
                   <button onClick={() => { onFavoritesClick(); setIsProfileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-[#EDE8D0] hover:bg-[#252525] transition-colors">
                     <HeartIcon className="w-5 h-5 text-[#C45A2A]" />
@@ -85,7 +83,7 @@ export function Header({ onLoginClick, onLogoClick, isLoggedIn, userName, userAv
                   </div>
 
                   <div className="h-px bg-[#333333] my-2" />
-                  
+
                   <button onClick={() => { onLogout(); setIsProfileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors group">
                     <LogOutIcon className="w-5 h-5" />
                     <span className="font-medium">Вийти з акаунта</span>
