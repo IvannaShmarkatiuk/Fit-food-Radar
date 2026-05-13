@@ -58,23 +58,5 @@ namespace FitFood.API.Controllers
 
             return Ok("Видалено з обраного.");
         }
-
-        // Видалити з обраного
-        [HttpDelete("{userId}/{restaurantId}")]
-        public async Task<IActionResult> RemoveFromFavorites(int userId, int restaurantId)
-        {
-            var favorite = await _context.Favorites
-                .FirstOrDefaultAsync(f => f.UserId == userId && f.RestaurantId == restaurantId);
-
-            if (favorite == null)
-            {
-                return NotFound("Запис не знайдено.");
-            }
-
-            _context.Favorites.Remove(favorite);
-            await _context.SaveChangesAsync();
-
-            return Ok("Видалено з обраного.");
-        }
     }
 }
