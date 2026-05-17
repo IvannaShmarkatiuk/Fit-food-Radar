@@ -52,10 +52,9 @@ app.UseSwaggerUI(c =>
 });
 
 
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
-
-app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
