@@ -17,7 +17,7 @@ namespace FitFood.API.Controllers
             _context = context;
         }
 
-        // РЕЄСТРАЦІЯ
+        // Регістрація
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(User user)
         {
@@ -43,13 +43,12 @@ namespace FitFood.API.Controllers
         public async Task<IActionResult> Login([FromBody] User loginDto)
         {
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == loginDto.Email && u.Password == loginDto.Password);
+                .FirstOrDefaultAsync(u => u.Email == loginDto.Email); // ← тільки email!
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
             {
                 return Unauthorized("Невірний email або пароль");
             }
-
             return Ok(user);
         }
 
