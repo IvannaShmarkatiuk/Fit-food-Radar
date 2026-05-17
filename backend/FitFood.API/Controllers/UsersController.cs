@@ -51,30 +51,5 @@ namespace FitFood.API.Controllers
             }
             return Ok(user);
         }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, User updatedUser)
-        {
-            if (id != updatedUser.Id) return BadRequest();
-
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
-
-            // Оновлюємо тільки ті поля, які прийшли
-            if (!string.IsNullOrEmpty(updatedUser.Name))
-                user.Name = updatedUser.Name;
-
-            if (!string.IsNullOrEmpty(updatedUser.Email))
-                user.Email = updatedUser.Email;
-
-            if (!string.IsNullOrEmpty(updatedUser.Password))
-                user.Password = updatedUser.Password;
-
-            if (updatedUser.AvatarUrl != null)
-                user.AvatarUrl = updatedUser.AvatarUrl;
-
-            await _context.SaveChangesAsync();
-            return Ok(user); // повертаємо оновленого юзера замість NoContent
-        }
     }
 }
